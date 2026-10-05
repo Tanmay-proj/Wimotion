@@ -1,0 +1,49 @@
+{
+  "manifest_version": "v1.0",
+  "created_at": "2026-09-23T17:30:00Z",
+  "description": "Formal session-level partition catalog enforcing zero-leakage research governance",
+  "partitions": {
+    "train": {
+      "description": "Sessions strictly reserved for fitting model parameters and feature normalizers",
+      "sessions": [
+        "empty_room.csv",
+        "empty_room_session_02.csv",
+        "empty_room_session_03.csv",
+        "empty_room_session_04.csv",
+        "empty_room_session_05.csv",
+        "walking.csv",
+        "walking_session_02.csv",
+        "walking_session_03.csv",
+        "walking_session_04.csv",
+        "walking_session_05.csv"
+      ],
+      "session_count": 10
+    },
+    "validation": {
+      "description": "Sessions strictly reserved for model selection, hyperparameter tuning, and threshold calibration",
+      "sessions": [
+        "empty_room_session_06.csv",
+        "empty_room_session_07.csv",
+        "walking_session_06.csv",
+        "walking_session_07.csv",
+        "walking_session_08.csv"
+      ],
+      "session_count": 5
+    },
+    "calibration": {
+      "description": "Ambient empty room reference baseline samples captured prior to deployment",
+      "sessions": [
+        "empty_room_session_08.csv"
+      ],
+      "session_count": 1
+    },
+    "test": {
+      "description": "Untouched physical holdout sessions strictly evaluated post-training (ZERO TOUCH RULE)",
+      "sessions": [],
+      "session_count": 0,
+      "status": "AWAITING_PHYSICAL_RECORDING",
+      "target_file": "unseen_entry_exit_test.csv",
+      "policy": "No synthetic data permitted. Pipeline halts with exit code 1 until physical session is captured."
+    }
+  }
+}

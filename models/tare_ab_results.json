@@ -1,0 +1,24 @@
+{
+  "condition_a_without_tare": {
+    "accuracy_pct": 95.62,
+    "recall_pct": 99.27,
+    "precision_pct": 95.09,
+    "f1_pct": 97.14,
+    "false_positive_rate_pct": 15.22,
+    "stability_index_pct": 99.64,
+    "entry_latency_sec": 0.3,
+    "evaluated_windows": 548
+  },
+  "condition_b_with_tare": {
+    "accuracy_pct": 82.66,
+    "recall_pct": 97.32,
+    "precision_pct": 82.61,
+    "f1_pct": 89.36,
+    "false_positive_rate_pct": 60.87,
+    "stability_index_pct": 97.63,
+    "entry_latency_sec": 0.1,
+    "evaluated_windows": 548
+  },
+  "status": "REPORTED_INVESTIGATION",
+  "finding": "Domain shift observed when injecting local TARE baseline into globally-normalized model. Static baseline preferred until per-session training alignment is established."
+}

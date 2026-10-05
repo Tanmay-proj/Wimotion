@@ -1,0 +1,141 @@
+{
+  "model_type": "HistGradientBoostingClassifier",
+  "stage": "Stage-2 Multi-Class Activity Recognizer",
+  "total_windows": 34720,
+  "train_windows": 27776,
+  "test_windows": 6944,
+  "test_accuracy_pct": 33.81,
+  "macro_f1_pct": 34.22,
+  "classes": [
+    "arm_wave",
+    "fall",
+    "jump",
+    "running",
+    "squat",
+    "turn",
+    "walking"
+  ],
+  "classification_report": {
+    "arm_wave": {
+      "precision": 0.2753888380603843,
+      "recall": 0.3034274193548387,
+      "f1-score": 0.28872901678657076,
+      "support": 992.0
+    },
+    "fall": {
+      "precision": 0.2996138996138996,
+      "recall": 0.3911290322580645,
+      "f1-score": 0.33930913860953216,
+      "support": 992.0
+    },
+    "jump": {
+      "precision": 0.29704016913319237,
+      "recall": 0.28326612903225806,
+      "f1-score": 0.2899896800825593,
+      "support": 992.0
+    },
+    "running": {
+      "precision": 0.4456035767511177,
+      "recall": 0.3014112903225806,
+      "f1-score": 0.359591100420926,
+      "support": 992.0
+    },
+    "squat": {
+      "precision": 0.22504230118443316,
+      "recall": 0.26814516129032256,
+      "f1-score": 0.24471021159153633,
+      "support": 992.0
+    },
+    "turn": {
+      "precision": 0.35526315789473684,
+      "recall": 0.32661290322580644,
+      "f1-score": 0.3403361344537815,
+      "support": 992.0
+    },
+    "walking": {
+      "precision": 0.578698224852071,
+      "recall": 0.49294354838709675,
+      "f1-score": 0.5323897659227,
+      "support": 992.0
+    },
+    "accuracy": 0.3381336405529954,
+    "macro avg": {
+      "precision": 0.3538071667842621,
+      "recall": 0.33813364055299544,
+      "f1-score": 0.3421507211239438,
+      "support": 6944.0
+    },
+    "weighted avg": {
+      "precision": 0.35380716678426216,
+      "recall": 0.3381336405529954,
+      "f1-score": 0.3421507211239437,
+      "support": 6944.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      301,
+      150,
+      124,
+      60,
+      199,
+      113,
+      45
+    ],
+    [
+      137,
+      388,
+      110,
+      58,
+      153,
+      98,
+      48
+    ],
+    [
+      134,
+      188,
+      281,
+      61,
+      175,
+      122,
+      31
+    ],
+    [
+      109,
+      118,
+      97,
+      299,
+      142,
+      69,
+      158
+    ],
+    [
+      181,
+      201,
+      150,
+      39,
+      266,
+      120,
+      35
+    ],
+    [
+      146,
+      156,
+      120,
+      52,
+      155,
+      324,
+      39
+    ],
+    [
+      85,
+      94,
+      64,
+      102,
+      92,
+      66,
+      489
+    ]
+  ],
+  "training_duration_sec": 18.52
+}

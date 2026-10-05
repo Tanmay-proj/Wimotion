@@ -1,0 +1,16 @@
+{
+  "dataset": "esp_fi",
+  "sample_id": "espfi_3-7-5-7_arm_wave",
+  "participant_id": "7",
+  "environment_id": "3",
+  "activity_label": "arm_wave",
+  "presence_label": 1,
+  "source_file": "datasets\\public\\esp_fi\\Model Code\\Data\\train_amp\\arm_wave\\3-7-5-7.mat",
+  "original_shape": [
+    950,
+    52
+  ],
+  "original_sampling_rate": null,
+  "num_subcarriers": 52,
+  "adapter_version": "v1.0"
+}

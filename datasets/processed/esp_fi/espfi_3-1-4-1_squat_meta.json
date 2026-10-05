@@ -1,0 +1,16 @@
+{
+  "dataset": "esp_fi",
+  "sample_id": "espfi_3-1-4-1_squat",
+  "participant_id": "1",
+  "environment_id": "3",
+  "activity_label": "squat",
+  "presence_label": 1,
+  "source_file": "datasets\\public\\esp_fi\\Model Code\\Data\\test_amp\\squat\\3-1-4-1.mat",
+  "original_shape": [
+    950,
+    52
+  ],
+  "original_sampling_rate": null,
+  "num_subcarriers": 52,
+  "adapter_version": "v1.0"
+}

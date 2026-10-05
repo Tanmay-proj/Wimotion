@@ -1,0 +1,128 @@
+{
+  "mean_loso_accuracy": 0.6852639311103458,
+  "std_loso_accuracy": 0.22066873942681114,
+  "total_sessions_evaluated": 15,
+  "individual_results": [
+    {
+      "session": "empty_room.csv",
+      "type": "empty",
+      "label": 0,
+      "windows": 430,
+      "accuracy": 0.3930232558139535,
+      "f1": 0.5642737896494157
+    },
+    {
+      "session": "empty_room_session_02.csv",
+      "type": "empty",
+      "label": 0,
+      "windows": 482,
+      "accuracy": 0.4066390041493776,
+      "f1": 0.5781710914454278
+    },
+    {
+      "session": "empty_room_session_03.csv",
+      "type": "empty",
+      "label": 0,
+      "windows": 503,
+      "accuracy": 0.9145129224652088,
+      "f1": 0.9553478712357217
+    },
+    {
+      "session": "empty_room_session_04.csv",
+      "type": "empty",
+      "label": 0,
+      "windows": 459,
+      "accuracy": 0.39651416122004357,
+      "f1": 0.5678627145085804
+    },
+    {
+      "session": "empty_room_session_05.csv",
+      "type": "empty",
+      "label": 0,
+      "windows": 435,
+      "accuracy": 0.8597701149425288,
+      "f1": 0.9245982694684796
+    },
+    {
+      "session": "empty_room_session_06.csv",
+      "type": "empty",
+      "label": 0,
+      "windows": 476,
+      "accuracy": 0.8508403361344538,
+      "f1": 0.9194097616345063
+    },
+    {
+      "session": "empty_room_session_07.csv",
+      "type": "empty",
+      "label": 0,
+      "windows": 399,
+      "accuracy": 0.9699248120300752,
+      "f1": 0.9847328244274809
+    },
+    {
+      "session": "walking.csv",
+      "type": "walking",
+      "label": 1,
+      "windows": 414,
+      "accuracy": 0.8309178743961353,
+      "f1": 0.9076517150395779
+    },
+    {
+      "session": "walking_session_02.csv",
+      "type": "walking",
+      "label": 1,
+      "windows": 531,
+      "accuracy": 0.9077212806026366,
+      "f1": 0.9516288252714709
+    },
+    {
+      "session": "walking_session_03.csv",
+      "type": "walking",
+      "label": 1,
+      "windows": 351,
+      "accuracy": 0.9658119658119658,
+      "f1": 0.9826086956521739
+    },
+    {
+      "session": "walking_session_04.csv",
+      "type": "walking",
+      "label": 1,
+      "windows": 414,
+      "accuracy": 0.7705314009661836,
+      "f1": 0.8703956343792633
+    },
+    {
+      "session": "walking_session_05.csv",
+      "type": "walking",
+      "label": 1,
+      "windows": 434,
+      "accuracy": 0.49539170506912444,
+      "f1": 0.662557781201849
+    },
+    {
+      "session": "walking_session_06.csv",
+      "type": "walking",
+      "label": 1,
+      "windows": 435,
+      "accuracy": 0.5448275862068965,
+      "f1": 0.7053571428571429
+    },
+    {
+      "session": "walking_session_07.csv",
+      "type": "walking",
+      "label": 1,
+      "windows": 402,
+      "accuracy": 0.5074626865671642,
+      "f1": 0.6732673267326733
+    },
+    {
+      "session": "walking_session_08.csv",
+      "type": "walking",
+      "label": 1,
+      "windows": 501,
+      "accuracy": 0.46506986027944114,
+      "f1": 0.6348773841961853
+    }
+  ],
+  "status": "COMPLETED"
+}

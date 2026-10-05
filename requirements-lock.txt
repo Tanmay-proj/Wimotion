@@ -1,0 +1,9 @@
+# WiMotion: Locked Reproducible Dependencies
+# Models were trained with Python 3.10 and scikit-learn 1.7.2.
+# Use these EXACT versions for reproducible results.
+numpy==1.26.4
+pandas==2.2.3
+scikit-learn==1.7.2
+scipy==1.14.1
+pyserial==3.5
+websockets==14.1

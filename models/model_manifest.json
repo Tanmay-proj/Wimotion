@@ -1,0 +1,39 @@
+{
+  "model_file": "wimotion_model.pkl",
+  "model_version": "v2.4",
+  "python_version": "3.10",
+  "scikit_learn_version": "1.7.2",
+  "feature_engine_version": "v2.4",
+  "feature_count": 217,
+  "classes": [
+    "empty_room",
+    "human_present"
+  ],
+  "baseline_mode": "in_fold_median_subtraction",
+  "training_sessions": [
+    "empty_room",
+    "empty_room_session_02",
+    "empty_room_session_03",
+    "empty_room_session_04",
+    "empty_room_session_05",
+    "walking",
+    "walking_session_02",
+    "walking_session_03",
+    "walking_session_04",
+    "walking_session_05"
+  ],
+  "evaluation_sessions": [
+    "empty_room_session_06.csv",
+    "empty_room_session_07.csv",
+    "walking_session_06.csv",
+    "walking_session_07.csv",
+    "walking_session_08.csv"
+  ],
+  "sha256": "a1c1dfff6d6961e00da1201578769dc21b223c045667af9d4b2409bfa9d9314e",
+  "honest_baseline_accuracy_pct": 70.46,
+  "accuracy_source": "presence_model_scorecard.json",
+  "tare_false_positive_rate_pct": 60.87,
+  "tare_status": "DISABLED_BY_DEFAULT",
+  "activity_head_status": "DISABLED_BY_DEFAULT",
+  "created_at": "2026-10-04T02:30:12.746947+00:00"
+}

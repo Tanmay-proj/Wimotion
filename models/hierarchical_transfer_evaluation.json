@@ -1,0 +1,33 @@
+{
+  "evaluation_timestamp": 1788851345.4704554,
+  "unseen_empty_sessions": [
+    "empty_room_session_06.csv",
+    "empty_room_session_07.csv"
+  ],
+  "unseen_walking_sessions": [
+    "walking_session_07.csv",
+    "walking_session_08.csv"
+  ],
+  "total_test_windows": 381,
+  "empty_test_windows": 174,
+  "walking_test_windows": 207,
+  "stage1_metrics": {
+    "binary_accuracy_pct": 100.0,
+    "binary_f1_pct": 100.0,
+    "true_positive_rate_pct": 100.0,
+    "false_alarm_rate_pct": 0.0
+  },
+  "stage2_metrics": {
+    "gated_windows": 207,
+    "walking_recognition_pct": 14.49,
+    "activity_distribution": {
+      "arm_wave": 10,
+      "running": 151,
+      "fall": 1,
+      "jump": 6,
+      "walking": 30,
+      "turn": 8,
+      "squat": 1
+    }
+  }
+}

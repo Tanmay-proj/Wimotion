@@ -1,0 +1,26 @@
+{
+  "activity_label": "empty_room",
+  "session_index": 8,
+  "dataset_status": "VALID_COMPLETE",
+  "recorded_timestamp_utc": "2026-09-04T06:02:34.456527+00:00",
+  "duration_seconds": 90.08,
+  "target_sampling_rate_hz": 10.0,
+  "measured_sampling_rate_hz": 19.28,
+  "baudrate": 921600,
+  "serial_port_host": "COM8",
+  "num_csi_samples": 64,
+  "subcarrier_mapping": "first_64_complex",
+  "window_size": 25,
+  "windowing_mode": "time_based_v1.3",
+  "window_duration_sec": 1.8,
+  "timestamp_source": "host_time",
+  "engine_version": "v1.4",
+  "feature_count": 217,
+  "uniform_resample_fs": 20.0,
+  "valid_frame_count": 1737,
+  "corrupt_frame_count": 0,
+  "active_channels": [
+    "6"
+  ],
+  "average_rssi_dbm": -66.6
+}

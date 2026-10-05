@@ -1,0 +1,16 @@
+{
+  "dataset": "esp_fi",
+  "sample_id": "espfi_3-3-7-7_fall",
+  "participant_id": "3",
+  "environment_id": "3",
+  "activity_label": "fall",
+  "presence_label": 1,
+  "source_file": "datasets\\public\\esp_fi\\Model Code\\Data\\train_amp\\fall\\3-3-7-7.mat",
+  "original_shape": [
+    950,
+    52
+  ],
+  "original_sampling_rate": null,
+  "num_subcarriers": 52,
+  "adapter_version": "v1.0"
+}

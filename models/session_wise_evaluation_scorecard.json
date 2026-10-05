@@ -1,0 +1,130 @@
+{
+  "evaluation_timestamp": "2026-10-04T06:26:12Z",
+  "methodology": "Leakage-Free GroupKFold Cross-Validation (Partitioned by Session ID)",
+  "zero_window_leakage_verified": true,
+  "n_sessions": 15,
+  "total_windows": 6666,
+  "metrics": {
+    "window_accuracy_pct": 68.09,
+    "precision_pct": 68.94,
+    "recall_pct": 70.82,
+    "f1_pct": 69.87,
+    "specificity_pct": 65.11,
+    "fpr_pct": 34.89,
+    "fnr_pct": 29.18,
+    "session_level_accuracy_pct": 73.33
+  },
+  "confusion_matrix": {
+    "true_negatives": 2073,
+    "false_positives": 1111,
+    "false_negatives": 1016,
+    "true_positives": 2466
+  },
+  "session_details": {
+    "empty_room": {
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "window_accuracy": 0.17906976744186046,
+      "window_count": 430
+    },
+    "walking_session_02": {
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "window_accuracy": 0.9585687382297552,
+      "window_count": 531
+    },
+    "walking_session_03": {
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "window_accuracy": 0.9145299145299145,
+      "window_count": 351
+    },
+    "walking_session_05": {
+      "ground_truth": 1,
+      "predicted": 0,
+      "correct": false,
+      "window_accuracy": 0.4700460829493088,
+      "window_count": 434
+    },
+    "empty_room_session_03": {
+      "ground_truth": 0,
+      "predicted": 0,
+      "correct": true,
+      "window_accuracy": 0.9363817097415507,
+      "window_count": 503
+    },
+    "empty_room_session_07": {
+      "ground_truth": 0,
+      "predicted": 0,
+      "correct": true,
+      "window_accuracy": 0.8972431077694235,
+      "window_count": 399
+    },
+    "walking_session_07": {
+      "ground_truth": 1,
+      "predicted": 0,
+      "correct": false,
+      "window_accuracy": 0.4651741293532338,
+      "window_count": 402
+    },
+    "empty_room_session_05": {
+      "ground_truth": 0,
+      "predicted": 0,
+      "correct": true,
+      "window_accuracy": 0.9264367816091954,
+      "window_count": 435
+    },
+    "walking_session_08": {
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "window_accuracy": 0.5329341317365269,
+      "window_count": 501
+    },
+    "walking_session_04": {
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "window_accuracy": 0.9009661835748792,
+      "window_count": 414
+    },
+    "walking_session_06": {
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "window_accuracy": 0.6045977011494252,
+      "window_count": 435
+    },
+    "empty_room_session_02": {
+      "ground_truth": 0,
+      "predicted": 0,
+      "correct": true,
+      "window_accuracy": 0.5954356846473029,
+      "window_count": 482
+    },
+    "empty_room_session_04": {
+      "ground_truth": 0,
+      "predicted": 1,
+      "correct": false,
+      "window_accuracy": 0.35294117647058826,
+      "window_count": 459
+    },
+    "walking": {
+      "ground_truth": 1,
+      "predicted": 1,
+      "correct": true,
+      "window_accuracy": 0.8260869565217391,
+      "window_count": 414
+    },
+    "empty_room_session_06": {
+      "ground_truth": 0,
+      "predicted": 0,
+      "correct": true,
+      "window_accuracy": 0.6617647058823529,
+      "window_count": 476
+    }
+  }
+}

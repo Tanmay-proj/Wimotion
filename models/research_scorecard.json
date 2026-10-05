@@ -1,0 +1,14 @@
+{
+  "holdout_accuracy": 0.9280936454849499,
+  "recall": 0.9926829268292683,
+  "precision": 0.9105145413870246,
+  "f1_score": 0.9498249708284714,
+  "synthetic_noise_fpr_pct": 0.0,
+  "fan_stress_fpr_pct": 0.0,
+  "standing_micro_recall_pct": 100.0,
+  "standing_data_available": true,
+  "stability_index_pct": 99.1638795986622,
+  "all_tests_passed": true,
+  "status": "STALE_UNVERIFIABLE",
+  "note": "Generated from data/unseen_entry_exit_test.csv which is MISSING from the archive. This accuracy figure (92.8%) cannot be reproduced or verified. Do not cite as final accuracy. Use session_wise_evaluation_scorecard.json (70.3%) as the honest baseline."
+}

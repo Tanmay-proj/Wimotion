@@ -1,0 +1,15 @@
+{
+  "model_type": "ExtraTrees",
+  "stage": "Stage-1 Binary Presence Gate",
+  "total_windows": 5854,
+  "n_sessions": 10,
+  "cv_methodology": "StratifiedGroupKFold (in-fold baseline, zero-leakage)",
+  "cv_accuracy_pct": 70.46,
+  "cv_f1_pct": 71.68,
+  "held_out_test_metrics": null,
+  "classes": [
+    "empty_room",
+    "human_present"
+  ],
+  "sha256": "a1c1dfff6d6961e00da1201578769dc21b223c045667af9d4b2409bfa9d9314e"
+}
