@@ -9,7 +9,7 @@ from pptx.enum.shapes import MSO_SHAPE
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_FILE = ROOT.parent / "intermediate_ppt.pptx"
 
-# Official & Cadet Image Assets
+# Official Insignia & Framework Graphics
 IMG_CREST_LEFT   = ROOT / "dashboard" / "assets" / "lrp_extracted" / "Image8.png"
 IMG_CREST_RIGHT  = ROOT / "dashboard" / "assets" / "lrp_extracted" / "Image12.png"
 IMG_FRAMEWORK    = ROOT / "dashboard" / "assets" / "lrp_extracted" / "Image98.jpg"
@@ -17,10 +17,17 @@ IMG_MIL_APP      = ROOT / "dashboard" / "assets" / "lrp_extracted" / "Image137.j
 IMG_OBSERVATORY  = ROOT / "docs" / "assets" / "screen_wide.png"
 IMG_ECHO_HUD     = ROOT.parent / "echo" / "tactical_hud_preview.png"
 
-# Cadet Real Hardware & Setup Photos
-IMG_USER_SETUP    = ROOT / "dashboard" / "assets" / "user_setup" / "testbed_dual_node_setup.jpg"
-IMG_USER_LAPTOP   = ROOT / "dashboard" / "assets" / "user_setup" / "live_observatory_laptop.jpg"
-IMG_USER_DEVBOARD = ROOT / "dashboard" / "assets" / "user_setup" / "esp32_devkit_closeup.jpg"
+# Cadet Real Hardware & Testbed Photos (Optimized from real_setup)
+IMG_CADET_UNIFORM = ROOT / "dashboard" / "assets" / "user_setup" / "cadet_uniform_in_zone.jpg"
+IMG_TESTBED_WIDE  = ROOT / "dashboard" / "assets" / "user_setup" / "corridor_testbed_wide.jpg"
+IMG_LAPTOP_LIVE   = ROOT / "dashboard" / "assets" / "user_setup" / "laptop_live_observatory.jpg"
+IMG_DEVBOARD      = ROOT / "dashboard" / "assets" / "user_setup" / "esp32_devkit_closeup.jpg"
+
+# Cadet Real MP4 Videos & Poster Frames
+VID_WALK_TRIAL    = ROOT / "real_setup" / "corridor_walk_trial_h264.mp4"
+THUMB_WALK_TRIAL  = ROOT / "real_setup" / "GX013891_thumb.jpg"
+VID_MOTION_TRIAL  = ROOT / "real_setup" / "zone_motion_trial_h264.mp4"
+THUMB_MOTION_TRIAL= ROOT / "real_setup" / "GX013894_thumb.jpg"
 
 # Color Palette (Mil-Spec Standards)
 COLOR_RED_BANNER = RGBColor(215, 0, 0)       # Military Scarlet Red
@@ -332,19 +339,19 @@ Third, Real-Time Tactical Observatory HUD: We deliver an interactive 3D spatial 
         "2. The RF CSI Physical Solution",
         "3. System Evolution: Project ECHO",
         "4. Pivot to Project SHADOW & WiMotion",
-        "5. Hardware Testbed & Serial Architecture",
-        "6. RF Specifications & Geometry"
+        "5. Hardware Architecture (Cadet ESP32 Node)",
+        "6. Physical Testbed Geometry & RF Setup"
     ]
     add_bullet_list(s3, M_LEFT, CONTENT_TOP + Inches(0.78), COL_W_2, CONTENT_H - Inches(0.85), b1_items, space_after=14)
 
     add_card(s3, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "PART II: PROTOTYPE, TRIALS & SCOPE", COLOR_ACCENT_BLUE)
     b2_items = [
         "7. 6-Stage Signal Processing Pipeline",
-        "8. WiMotion 3D Sensing Observatory",
-        "9. Video Demonstration & Physical Trials",
-        "10. Empirical Benchmarks & Scientific Limits",
-        "11. Tactical Applications & Military Scenarios",
-        "12. Engineering Challenges & Roadmap"
+        "8. WiMotion 3D Sensing Observatory HUD",
+        "9. Video Trial 1: Corridor Walkway Traversal",
+        "10. Video Trial 2: In-Zone Motion & Live HUD",
+        "11. Empirical Benchmarks & Scientific Limits",
+        "12. Tactical Applications & Final Roadmap"
     ]
     add_bullet_list(s3, COL_R_LEFT, CONTENT_TOP + Inches(0.78), COL_W_2, CONTENT_H - Inches(0.85), b2_items, space_after=14)
 
@@ -355,12 +362,12 @@ Part I covers our Operational & Technical Foundation:
 - The sensory dilemma in Close Quarters Battle.
 - The RF physics enabling through-wall sensing.
 - The real engineering evolution and pivots of our project: from Project Echo to Project Shadow, and finally to WiMotion.
-- Our ESP32 dual-node hardware testbed and RF deployment geometry.
+- Our real ESP32 transceiver hardware and laboratory corridor testbed setup.
 
 Part II covers our Engineering Prototype, Empirical Trials, and Way Ahead:
 - Our 6-stage signal processing and machine learning pipeline.
 - The live 3D Sensing Observatory prototype.
-- Our recorded hardware trial demonstration.
+- Two live recorded physical video demonstrations showing corridor entry and in-zone gesture movement.
 - Quantitative benchmarks and honest scientific boundaries.
 - Defence use-cases, challenges mitigated, and our roadmap to final defence."
 """)
@@ -499,16 +506,15 @@ We therefore engineered WiMotion as an ultra-reliable, hardened binary presence 
 """)
 
     # =========================================================================
-    # SLIDE 8: HARDWARE ARCHITECTURE — REAL ESP32 DEVKIT PHOTO
+    # SLIDE 8: HARDWARE ARCHITECTURE — REAL CADET ESP32 PHOTO
     # =========================================================================
     s8 = prs.slides.add_slide(blank_layout)
     add_red_header(s8, "HARDWARE ARCHITECTURE")
     add_footer(s8)
 
-    # Left: Cadet Real Close-up Photo
     add_card(s8, M_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "ESP32 COTS TRANSCEIVER NODE", COLOR_ACCENT_RED)
-    if IMG_USER_DEVBOARD.exists():
-        s8.shapes.add_picture(str(IMG_USER_DEVBOARD), M_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), width=Inches(4.90))
+    if IMG_DEVBOARD.exists():
+        s8.shapes.add_picture(str(IMG_DEVBOARD), M_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), width=Inches(4.90))
     tb_lbl = s8.shapes.add_textbox(M_LEFT, CONTENT_TOP + Inches(4.55), COL_W_2, Inches(0.65))
     tf = tb_lbl.text_frame
     tf.margin_left = Inches(0.35); tf.margin_right = Inches(0.35)
@@ -516,7 +522,6 @@ We therefore engineered WiMotion as an ultra-reliable, hardened binary presence 
     p.text = "Physical Node: ESP32-WROOM-32 DevKitC v4 with onboard PCB antenna, CP2102 UART bridge, and protective foam backing."
     p.font.name = FONT_NAME_BODY; p.font.size = Pt(13); p.font.color.rgb = COLOR_MUTED_TEXT
 
-    # Right: Transceiver Specifications
     add_card(s8, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "TRANSCEIVER SPECIFICATIONS", COLOR_ACCENT_BLUE)
     s8_pts = [
         ("▪ Microcontrollers:", COLOR_ACCENT_BLUE, "ESP32-WROOM-32 / DevKitC v4 (Xtensa Dual-Core 240 MHz)."),
@@ -545,10 +550,9 @@ A major hardware milestone was locking our physical serial pipeline at 921,600 b
     add_red_header(s9, "RF SPECIFICATIONS & GEOMETRY")
     add_footer(s9)
 
-    # Left: Cadet Real Testbed Setup Photo
     add_card(s9, M_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "PHYSICAL DUAL-NODE TESTBED SETUP", COLOR_ACCENT_BLUE)
-    if IMG_USER_SETUP.exists():
-        s9.shapes.add_picture(str(IMG_USER_SETUP), M_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), width=Inches(4.90))
+    if IMG_TESTBED_WIDE.exists():
+        s9.shapes.add_picture(str(IMG_TESTBED_WIDE), M_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), width=Inches(4.90))
     tb_lbl = s9.shapes.add_textbox(M_LEFT, CONTENT_TOP + Inches(4.55), COL_W_2, Inches(0.65))
     tf = tb_lbl.text_frame
     tf.margin_left = Inches(0.35); tf.margin_right = Inches(0.35)
@@ -556,7 +560,6 @@ A major hardware milestone was locking our physical serial pipeline at 921,600 b
     p.text = "Corridor Deployment: Dual ESP32 transceivers elevated at 0.75m across a 1.8m walkway corridor (Fresnel zone)."
     p.font.name = FONT_NAME_BODY; p.font.size = Pt(13); p.font.color.rgb = COLOR_MUTED_TEXT
 
-    # Right: Parameters
     add_card(s9, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "DEPLOYMENT GEOMETRY & PARAMETERS", COLOR_ACCENT_RED)
     s9_pts2 = [
         ("• Baseline Separation:", COLOR_ACCENT_RED, "1.5 m to 2.0 m node separation across corridor / doorway passage."),
@@ -650,73 +653,99 @@ As displayed on the right:
 """)
 
     # =========================================================================
-    # SLIDE 12: SYSTEM DEMONSTRATION & LIVE LAPTOP TELEMETRY
+    # SLIDE 12: SYSTEM DEMONSTRATION 1 — EMBEDDED VIDEO 1 (WALK TRAIL)
     # =========================================================================
     s12 = prs.slides.add_slide(blank_layout)
-    add_red_header(s12, "SYSTEM DEMONSTRATION")
+    add_red_header(s12, "SYSTEM DEMONSTRATION: CORRIDOR WALK")
     add_footer(s12)
 
-    # Left Card: Real Cadet Laptop Running WiMotion in his room
-    add_card(s12, M_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "LIVE CSI TESTBED ACQUISITION", COLOR_ACCENT_BLUE)
-    if IMG_USER_LAPTOP.exists():
-        s12.shapes.add_picture(str(IMG_USER_LAPTOP), M_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), width=Inches(4.90))
+    # Left: Cadet in Uniform In-Zone
+    add_card(s12, M_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "OFFICER CADET IN-ZONE CALIBRATION", COLOR_ACCENT_BLUE)
+    if IMG_CADET_UNIFORM.exists():
+        s12.shapes.add_picture(str(IMG_CADET_UNIFORM), M_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), width=Inches(4.90))
     tb_lbl = s12.shapes.add_textbox(M_LEFT, CONTENT_TOP + Inches(4.55), COL_W_2, Inches(0.65))
-    tf = tb_lbl.text_frame
-    tf.margin_left = Inches(0.35); tf.margin_right = Inches(0.35)
+    tf = tb_lbl.text_frame; tf.margin_left = Inches(0.35); tf.margin_right = Inches(0.35)
     p = tf.paragraphs[0]
-    p.text = "Field Telemetry: WiMotion 3D Observatory running at 127.0.0.1:8000 connected via USB-UART to the RX sniffer node."
+    p.text = "Empirical In-Zone Calibration: Officer Cadet standing in the 1st Fresnel zone corridor between TX and RX nodes."
     p.font.name = FONT_NAME_BODY; p.font.size = Pt(13); p.font.color.rgb = COLOR_MUTED_TEXT
 
-    # Right Card: Video Demo Slot & Trial Highlights
-    add_card(s12, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "🎥 DEMO VIDEO / FIELD TRIALS", COLOR_ACCENT_RED)
-
-    v_frame = s12.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, COL_R_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), COL_W_2 - Inches(0.60), Inches(1.80))
-    v_frame.fill.solid()
-    v_frame.fill.fore_color.rgb = RGBColor(240, 244, 252)
-    v_frame.line.color.rgb = COLOR_ACCENT_RED
-    v_frame.line.width = Pt(1.5)
-
-    tb_v = s12.shapes.add_textbox(COL_R_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), COL_W_2 - Inches(0.60), Inches(1.80))
-    tf_v = tb_v.text_frame
-    tf_v.word_wrap = True
-    tf_v.margin_top = Inches(0.40)
-    p = tf_v.paragraphs[0]
-    p.alignment = PP_ALIGN.CENTER
-    p.text = "[ CLICK TO PLAY / INSERT DEMO VIDEO ]"
-    p.font.name = FONT_NAME_HEAD
-    p.font.size = Pt(18)
-    p.font.bold = True
-    p.font.color.rgb = COLOR_ACCENT_RED
-
-    p_sub = tf_v.add_paragraph()
-    p_sub.alignment = PP_ALIGN.CENTER
-    p_sub.text = "(Reserved video frame for embedding recorded .mp4 demonstration)"
-    p_sub.font.name = FONT_NAME_BODY
-    p_sub.font.size = Pt(13)
-    p_sub.font.color.rgb = COLOR_MUTED_TEXT
-    p_sub.space_before = Pt(4)
-
-    v_pts = [
-        ("★ 921,600 Baud Telemetry:", COLOR_ACCENT_RED, "Continuous live packet capture without buffer drop."),
-        ("★ Corridor Walkway:", COLOR_ACCENT_RED, "Human traversal through the 1st Fresnel zone."),
-        ("★ Instant Alert:", COLOR_ACCENT_RED, "3D HUD presence dial switches to RED in < 50 ms.")
+    # Right: Embedded Video 1 (Corridor Walkway Traversal)
+    add_card(s12, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "▶ VIDEO TRIAL 1: CORRIDOR TRAVERSAL", COLOR_ACCENT_RED)
+    if VID_WALK_TRIAL.exists():
+        s12.shapes.add_movie(
+            str(VID_WALK_TRIAL),
+            COL_R_LEFT + Inches(0.30),
+            CONTENT_TOP + Inches(0.85),
+            COL_W_2 - Inches(0.60),
+            Inches(2.70),
+            poster_frame_image=str(THUMB_WALK_TRIAL) if THUMB_WALK_TRIAL.exists() else None,
+            mime_type="video/mp4"
+        )
+    v1_pts = [
+        ("★ Walkway Traversal:", COLOR_ACCENT_RED, "Operator walks directly across the 1st Fresnel zone corridor."),
+        ("★ 921,600 Baud Streaming:", COLOR_ACCENT_RED, "Live terminal capture without buffer overflow drops."),
+        ("★ Instant Trigger:", COLOR_ACCENT_RED, "Doppler micro-shift immediately registered across subcarriers.")
     ]
-    add_bullet_list(s12, COL_R_LEFT, CONTENT_TOP + Inches(2.80), COL_W_2, Inches(2.35), v_pts, space_after=10)
+    add_bullet_list(s12, COL_R_LEFT, CONTENT_TOP + Inches(3.60), COL_W_2, Inches(1.55), v1_pts, space_after=6)
 
-    set_notes(s12, """[PRESENTER SCRIPT - SLIDE 12: SYSTEM DEMONSTRATION]
-"Sirs, this slide demonstrates our live telemetry pipeline.
-On the left is a photograph of our actual workstation during data capture, running the WiMotion 3D Sensing Observatory at localhost port 8000, connected to the ESP32 receiver node over USB.
-On the right is our field trial video demonstration frame:
-[Cadet Note: If playing video, play now. If speaking directly:]
-During our trials, as an operator approaches and walks across the corridor into the sensing zone, you observe the immediate amplitude disruption across the 52 subcarriers. The 3D Observatory presence dial spikes from baseline noise to over 90% presence probability in under 50 milliseconds, immediately triggering the RED tactical alert."
+    set_notes(s12, """[PRESENTER SCRIPT - SLIDE 12: VIDEO TRIAL 1]
+"Sirs, this slide demonstrates our first physical trial: corridor traversal and live data capture.
+On the left is an empirical photograph showing Officer Cadet Tanmay standing at attention directly inside the 1st Fresnel zone corridor between the two ESP32 nodes, with the live WiMotion workstation running.
+On the right is our recorded physical video demonstration:
+[Cadet Note: Click on the video to play.]
+In this trial, as the cadet approaches and traverses the central corridor along the floor mat, you observe the live terminal streaming CSI frames at 921,600 baud. As soon as the body cuts through the line of sight, the subcarrier amplitude drops dramatically, triggering instantaneous presence detection."
 """)
 
     # =========================================================================
-    # SLIDE 13: TRIAL RESULTS — EMPIRICAL BENCHMARKS
+    # SLIDE 13: SYSTEM DEMONSTRATION 2 — EMBEDDED VIDEO 2 (IN-ZONE MOTION)
     # =========================================================================
     s13 = prs.slides.add_slide(blank_layout)
-    add_red_header(s13, "TRIAL RESULTS & BENCHMARKS")
+    add_red_header(s13, "SYSTEM DEMONSTRATION: IN-ZONE MOTION")
     add_footer(s13)
+
+    # Left: Workstation Telemetry Photo
+    add_card(s13, M_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "LIVE WORKSTATION ACQUISITION", COLOR_ACCENT_BLUE)
+    if IMG_LAPTOP_LIVE.exists():
+        s13.shapes.add_picture(str(IMG_LAPTOP_LIVE), M_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), width=Inches(4.90))
+    tb_lbl = s13.shapes.add_textbox(M_LEFT, CONTENT_TOP + Inches(4.55), COL_W_2, Inches(0.65))
+    tf = tb_lbl.text_frame; tf.margin_left = Inches(0.35); tf.margin_right = Inches(0.35)
+    p = tf.paragraphs[0]
+    p.text = "Workstation Telemetry: WiMotion 3D Observatory running at 127.0.0.1:8000 connected via USB-UART to the RX sniffer node."
+    p.font.name = FONT_NAME_BODY; p.font.size = Pt(13); p.font.color.rgb = COLOR_MUTED_TEXT
+
+    # Right: Embedded Video 2 (In-Zone Movement Trial)
+    add_card(s13, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "▶ VIDEO TRIAL 2: IN-ZONE MOVEMENT", COLOR_ACCENT_RED)
+    if VID_MOTION_TRIAL.exists():
+        s13.shapes.add_movie(
+            str(VID_MOTION_TRIAL),
+            COL_R_LEFT + Inches(0.30),
+            CONTENT_TOP + Inches(0.85),
+            COL_W_2 - Inches(0.60),
+            Inches(2.70),
+            poster_frame_image=str(THUMB_MOTION_TRIAL) if THUMB_MOTION_TRIAL.exists() else None,
+            mime_type="video/mp4"
+        )
+    v2_pts = [
+        ("★ In-Zone Movement:", COLOR_ACCENT_RED, "Dynamic human motion inside the active RF sensing volume."),
+        ("★ Wave Hologram:", COLOR_ACCENT_RED, "Three.js spatial wave disturbance rendering field perturbation."),
+        ("★ State Latch:", COLOR_ACCENT_RED, "Presence probability dial triggers RED alert in < 50 ms.")
+    ]
+    add_bullet_list(s13, COL_R_LEFT, CONTENT_TOP + Inches(3.60), COL_W_2, Inches(1.55), v2_pts, space_after=6)
+
+    set_notes(s13, """[PRESENTER SCRIPT - SLIDE 13: VIDEO TRIAL 2]
+"Sirs, this slide illustrates our second physical trial: in-zone human motion and real-time 3D HUD telemetry.
+On the left is a photograph of our actual workstation during data capture, running the WiMotion 3D Sensing Observatory at localhost port 8000, connected to the ESP32 receiver node over USB.
+On the right is our recorded physical video:
+[Cadet Note: Click on the video to play.]
+Here, the cadet performs subtle in-place movements and turns inside the sensing volume. Notice how the multipath reflections continuously perturb the 52 subcarriers, keeping the presence score stably above 90%, with zero false-clear dropouts thanks to our temporal hysteresis latching."
+""")
+
+    # =========================================================================
+    # SLIDE 14: TRIAL RESULTS — EMPIRICAL BENCHMARKS
+    # =========================================================================
+    s14 = prs.slides.add_slide(blank_layout)
+    add_red_header(s14, "TRIAL RESULTS & BENCHMARKS")
+    add_footer(s14)
 
     col4_w = Inches(2.62)
     c1_x = M_LEFT
@@ -726,43 +755,43 @@ During our trials, as an operator approaches and walks across the corridor into 
     kpi_h = Inches(2.40)
 
     # KPI 1
-    add_card(s13, c1_x, CONTENT_TOP, col4_w, kpi_h, "IN-FOLD BASELINE", COLOR_ACCENT_BLUE)
-    tb = s13.shapes.add_textbox(c1_x, CONTENT_TOP + Inches(0.75), col4_w, kpi_h - Inches(0.80))
+    add_card(s14, c1_x, CONTENT_TOP, col4_w, kpi_h, "IN-FOLD BASELINE", COLOR_ACCENT_BLUE)
+    tb = s14.shapes.add_textbox(c1_x, CONTENT_TOP + Inches(0.75), col4_w, kpi_h - Inches(0.80))
     tf = tb.text_frame; tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
     p = tf.paragraphs[0]; p.text = "70.58%"; p.font.name = FONT_NAME_HEAD; p.font.size = Pt(36); p.font.bold = True; p.font.color.rgb = COLOR_ACCENT_BLUE
     p2 = tf.add_paragraph(); p2.text = "F1-Score: 71.88%\nZero-leakage in-fold baseline cross-validation."; p2.font.name = FONT_NAME_BODY; p2.font.size = Pt(15); p2.font.color.rgb = COLOR_DARK_TEXT; p2.space_before = Pt(4)
 
     # KPI 2
-    add_card(s13, c2_x, CONTENT_TOP, col4_w, kpi_h, "GROUP-KFOLD", COLOR_ACCENT_GRN)
-    tb = s13.shapes.add_textbox(c2_x, CONTENT_TOP + Inches(0.75), col4_w, kpi_h - Inches(0.80))
+    add_card(s14, c2_x, CONTENT_TOP, col4_w, kpi_h, "GROUP-KFOLD", COLOR_ACCENT_GRN)
+    tb = s14.shapes.add_textbox(c2_x, CONTENT_TOP + Inches(0.75), col4_w, kpi_h - Inches(0.80))
     tf = tb.text_frame; tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
     p = tf.paragraphs[0]; p.text = "70.30%"; p.font.name = FONT_NAME_HEAD; p.font.size = Pt(36); p.font.bold = True; p.font.color.rgb = COLOR_ACCENT_GRN
     p2 = tf.add_paragraph(); p2.text = "FPR: 31.4%\nEvaluated across distinct independent sessions."; p2.font.name = FONT_NAME_BODY; p2.font.size = Pt(15); p2.font.color.rgb = COLOR_DARK_TEXT; p2.space_before = Pt(4)
 
     # KPI 3
-    add_card(s13, c3_x, CONTENT_TOP, col4_w, kpi_h, "TEST SUITE", COLOR_ACCENT_RED)
-    tb = s13.shapes.add_textbox(c3_x, CONTENT_TOP + Inches(0.75), col4_w, kpi_h - Inches(0.80))
+    add_card(s14, c3_x, CONTENT_TOP, col4_w, kpi_h, "TEST SUITE", COLOR_ACCENT_RED)
+    tb = s14.shapes.add_textbox(c3_x, CONTENT_TOP + Inches(0.75), col4_w, kpi_h - Inches(0.80))
     tf = tb.text_frame; tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
     p = tf.paragraphs[0]; p.text = "25 / 25"; p.font.name = FONT_NAME_HEAD; p.font.size = Pt(34); p.font.bold = True; p.font.color.rgb = COLOR_ACCENT_RED
     p2 = tf.add_paragraph(); p2.text = "100% Automated Tests\nPassed signal gates, SHA-256 checks & API tests."; p2.font.name = FONT_NAME_BODY; p2.font.size = Pt(15); p2.font.color.rgb = COLOR_DARK_TEXT; p2.space_before = Pt(4)
 
     # KPI 4
-    add_card(s13, c4_x, CONTENT_TOP, col4_w, kpi_h, "LATENCY RESPONSE", COLOR_ACCENT_GOLD)
-    tb = s13.shapes.add_textbox(c4_x, CONTENT_TOP + Inches(0.75), col4_w, kpi_h - Inches(0.80))
+    add_card(s14, c4_x, CONTENT_TOP, col4_w, kpi_h, "LATENCY RESPONSE", COLOR_ACCENT_GOLD)
+    tb = s14.shapes.add_textbox(c4_x, CONTENT_TOP + Inches(0.75), col4_w, kpi_h - Inches(0.80))
     tf = tb.text_frame; tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
     p = tf.paragraphs[0]; p.text = "< 50 ms"; p.font.name = FONT_NAME_HEAD; p.font.size = Pt(36); p.font.bold = True; p.font.color.rgb = COLOR_ACCENT_GOLD
     p2 = tf.add_paragraph(); p2.text = "Sub-Second Trigger\nReal-time tactical alert with hysteresis latching."; p2.font.name = FONT_NAME_BODY; p2.font.size = Pt(15); p2.font.color.rgb = COLOR_DARK_TEXT; p2.space_before = Pt(4)
 
     # Bottom Summary Card
-    add_card(s13, M_LEFT, Inches(4.15), TOTAL_WIDTH, Inches(2.60), "EMPIRICAL BENCHMARK SUMMARY", COLOR_DARK_TEXT)
-    s13_pts = [
+    add_card(s14, M_LEFT, Inches(4.15), TOTAL_WIDTH, Inches(2.60), "EMPIRICAL BENCHMARK SUMMARY", COLOR_DARK_TEXT)
+    s14_pts = [
         ("• Dataset Scale:", COLOR_ACCENT_BLUE, "Tested across 570+ captured CSI sessions with human walk, entry, exit, and idle states."),
         ("• Security Verification:", COLOR_ACCENT_BLUE, "Embedded SHA-256 model weight checksum verification ensures zero tampering in field deployments."),
         ("• Signal Gate Integrity:", COLOR_ACCENT_BLUE, "Signal quality gates automatically discard corrupted frames before passing to classifier inference.")
     ]
-    add_bullet_list(s13, M_LEFT, Inches(4.88), TOTAL_WIDTH, Inches(1.75), s13_pts, space_after=10)
+    add_bullet_list(s14, M_LEFT, Inches(4.88), TOTAL_WIDTH, Inches(1.75), s14_pts, space_after=10)
 
-    set_notes(s13, """[PRESENTER SCRIPT - SLIDE 13: TRIAL RESULTS & BENCHMARKS]
+    set_notes(s14, """[PRESENTER SCRIPT - SLIDE 14: TRIAL RESULTS & BENCHMARKS]
 "Sirs, looking at our quantitative trial benchmarks:
 - Under rigorous in-fold baseline cross-validation, our system achieved 70.58% accuracy with an F1-score of 71.88%.
 - In Group-KFold cross-validation evaluated across completely independent recording sessions, accuracy remained steady at 70.30% with a 31.4% false positive rate.
@@ -771,29 +800,29 @@ During our trials, as an operator approaches and walks across the corridor into 
 """)
 
     # =========================================================================
-    # SLIDE 14: TRIAL RESULTS — SCIENTIFIC BOUNDARIES & HONEST FINDINGS
+    # SLIDE 15: TRIAL RESULTS — SCIENTIFIC BOUNDARIES & HONEST FINDINGS
     # =========================================================================
-    s14 = prs.slides.add_slide(blank_layout)
-    add_red_header(s14, "EMPIRICAL LIMITS & HONEST FINDINGS")
-    add_footer(s14)
+    s15 = prs.slides.add_slide(blank_layout)
+    add_red_header(s15, "EMPIRICAL LIMITS & HONEST FINDINGS")
+    add_footer(s15)
 
-    add_card(s14, M_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "PHYSICAL LIMITS OF A SINGLE RF LINK", COLOR_ACCENT_RED)
-    s14_pts1 = [
+    add_card(s15, M_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "PHYSICAL LIMITS OF A SINGLE RF LINK", COLOR_ACCENT_RED)
+    s15_pts1 = [
         ("▪ Scalar Energy Limit:", COLOR_ACCENT_RED, "A single SISO link (1 TX, 1 RX) captures aggregated multipath energy; it detects disturbance presence but cannot resolve multi-target 3D coordinates."),
         ("▪ Headcount Ambiguity:", COLOR_ACCENT_RED, "Without Angle-of-Arrival (AoA) antenna arrays, exact counting of multiple simultaneous persons is mathematically ill-posed."),
         ("▪ Binary Presence Focus:", COLOR_ACCENT_RED, "WiMotion prioritizes 100% hardened binary presence detection over unvalidated 3D skeleton claims.")
     ]
-    add_bullet_list(s14, M_LEFT, CONTENT_TOP + Inches(0.78), COL_W_2, CONTENT_H - Inches(0.85), s14_pts1, space_after=18)
+    add_bullet_list(s15, M_LEFT, CONTENT_TOP + Inches(0.78), COL_W_2, CONTENT_H - Inches(0.85), s15_pts1, space_after=18)
 
-    add_card(s14, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "CROSS-ROOM GENERALIZATION & DRIFT", COLOR_ACCENT_BLUE)
-    s14_pts2 = [
+    add_card(s15, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "CROSS-ROOM GENERALIZATION & DRIFT", COLOR_ACCENT_BLUE)
+    s15_pts2 = [
         ("★ Room Dependency (14.5%):", COLOR_ACCENT_BLUE, "RF propagation is strictly dependent on wall boundaries; uncalibrated cross-room transfer drops to chance level. WiMotion transparently reports this."),
         ("★ TARE Baseline Drift (60.8% FPR):", COLOR_ACCENT_BLUE, "Auto-zeroing (TARE) in uncalibrated environments caused 60.8% false alarms due to multipath drift."),
         ("★ Pre-Flight Calibration:", COLOR_ACCENT_BLUE, "Enforces mandatory empty-room baseline sampling to guarantee high operational detection precision.")
     ]
-    add_bullet_list(s14, COL_R_LEFT, CONTENT_TOP + Inches(0.78), COL_W_2, CONTENT_H - Inches(0.85), s14_pts2, space_after=18)
+    add_bullet_list(s15, COL_R_LEFT, CONTENT_TOP + Inches(0.78), COL_W_2, CONTENT_H - Inches(0.85), s15_pts2, space_after=18)
 
-    set_notes(s14, """[PRESENTER SCRIPT - SLIDE 14: EMPIRICAL LIMITS & HONEST FINDINGS]
+    set_notes(s15, """[PRESENTER SCRIPT - SLIDE 15: EMPIRICAL LIMITS & HONEST FINDINGS]
 "Sirs, maintaining scientific honesty is critical in military research. We want to highlight two vital physical findings:
 First, a single SISO Wi-Fi link captures total multipath energy fluctuation. It reliably indicates whether an occupant is present, but cannot mathematically resolve individual 3D coordinate skeletons without phased arrays.
 Second, RF propagation is strictly room-specific due to boundary walls. Uncalibrated cross-room transfer drops to chance level (14.5%). Furthermore, live auto-zeroing (TARE) in uncalibrated environments caused 60.8% false alarms.
@@ -801,32 +830,32 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
 """)
 
     # =========================================================================
-    # SLIDE 15: APPLICATIONS AND MILITARY USE
+    # SLIDE 16: APPLICATIONS AND MILITARY USE
     # =========================================================================
-    s15 = prs.slides.add_slide(blank_layout)
-    add_red_header(s15, "APPLICATIONS AND MILITARY USE")
-    add_footer(s15)
+    s16 = prs.slides.add_slide(blank_layout)
+    add_red_header(s16, "APPLICATIONS AND MILITARY USE")
+    add_footer(s16)
 
-    add_card(s15, M_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "TACTICAL DEFENCE APPLICATIONS", COLOR_ACCENT_RED)
-    s15_pts = [
+    add_card(s16, M_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "TACTICAL DEFENCE APPLICATIONS", COLOR_ACCENT_RED)
+    s16_pts = [
         ("★ CQB Pre-Breach Recon:", COLOR_ACCENT_RED, "Detects armed combatants or ambushes behind closed doors/walls before entry, saving point-men lives."),
         ("★ Bunker & Tunnel Recon:", COLOR_ACCENT_RED, "Provides contactless presence alerts in smoke-filled tunnels or zero-light bunkers where optical sensors fail."),
         ("★ Covert Hostage Monitoring:", COLOR_ACCENT_RED, "Allows surveillance of hostile rooms without drilling holes, breaking glass, or planting visible cameras."),
         ("★ Perimeter Tripwire:", COLOR_ACCENT_RED, "Sets up a silent RF barrier across tactical corridors; alerts sentries immediately upon intrusion.")
     ]
-    add_bullet_list(s15, M_LEFT, CONTENT_TOP + Inches(0.78), COL_W_2, CONTENT_H - Inches(0.85), s15_pts, space_after=16)
+    add_bullet_list(s16, M_LEFT, CONTENT_TOP + Inches(0.78), COL_W_2, CONTENT_H - Inches(0.85), s16_pts, space_after=16)
 
-    add_card(s15, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "OPERATIONAL COMBAT SCENARIOS", COLOR_ACCENT_BLUE)
+    add_card(s16, COL_R_LEFT, CONTENT_TOP, COL_W_2, CONTENT_H, "OPERATIONAL COMBAT SCENARIOS", COLOR_ACCENT_BLUE)
     if IMG_MIL_APP.exists():
-        s15.shapes.add_picture(str(IMG_MIL_APP), COL_R_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), width=Inches(4.90))
-    tb_lbl = s15.shapes.add_textbox(COL_R_LEFT, CONTENT_TOP + Inches(4.55), COL_W_2, Inches(0.65))
+        s16.shapes.add_picture(str(IMG_MIL_APP), COL_R_LEFT + Inches(0.30), CONTENT_TOP + Inches(0.85), width=Inches(4.90))
+    tb_lbl = s16.shapes.add_textbox(COL_R_LEFT, CONTENT_TOP + Inches(4.55), COL_W_2, Inches(0.65))
     tf = tb_lbl.text_frame
     tf.margin_left = Inches(0.35); tf.margin_right = Inches(0.35)
     p = tf.paragraphs[0]
     p.text = "Operational Integration: Soldier monitoring, through-wall sensing, and autonomous tactical networks."
     p.font.name = FONT_NAME_BODY; p.font.size = Pt(13); p.font.color.rgb = COLOR_MUTED_TEXT
 
-    set_notes(s15, """[PRESENTER SCRIPT - SLIDE 15: APPLICATIONS AND MILITARY USE]
+    set_notes(s16, """[PRESENTER SCRIPT - SLIDE 16: APPLICATIONS AND MILITARY USE]
 "Sirs, the operational applications for the armed forces are immediate:
 1. CQB Room Pre-Breach Reconnaissance: Detecting barricaded or ambushing hostiles behind doors before point-men breach, directly preventing casualties.
 2. Underground Bunker and Trench Security: Contactless presence alerts in smoke-filled tunnels or zero-light bunkers where optical night-vision fails.
@@ -835,11 +864,11 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
 """)
 
     # =========================================================================
-    # SLIDE 16: ENGINEERING CHALLENGES & MITIGATIONS
+    # SLIDE 17: ENGINEERING CHALLENGES & MITIGATIONS
     # =========================================================================
-    s16 = prs.slides.add_slide(blank_layout)
-    add_red_header(s16, "CHALLENGES & MITIGATIONS")
-    add_footer(s16)
+    s17 = prs.slides.add_slide(blank_layout)
+    add_red_header(s17, "CHALLENGES & MITIGATIONS")
+    add_footer(s17)
 
     challenges = [
         ("1. Dynamic Multipath & Ambient Noise", 
@@ -856,12 +885,12 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
          COLOR_ACCENT_BLUE)
     ]
 
-    card_h_16 = Inches(1.60)
+    card_h_17 = Inches(1.60)
     for i, (title, issue, mit, col) in enumerate(challenges):
         top_pos = CONTENT_TOP + Inches(i * 1.85)
-        add_card(s16, M_LEFT, top_pos, TOTAL_WIDTH, card_h_16, title, col)
+        add_card(s17, M_LEFT, top_pos, TOTAL_WIDTH, card_h_17, title, col)
 
-        tb = s16.shapes.add_textbox(M_LEFT, top_pos + Inches(0.72), TOTAL_WIDTH, Inches(0.80))
+        tb = s17.shapes.add_textbox(M_LEFT, top_pos + Inches(0.72), TOTAL_WIDTH, Inches(0.80))
         tf = tb.text_frame
         tf.word_wrap = True
         tf.margin_left = Inches(0.35); tf.margin_right = Inches(0.35)
@@ -878,7 +907,7 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
         r3 = p2.add_run(); r3.text = "✔ "; r3.font.name = FONT_NAME_HEAD; r3.font.bold = True; r3.font.size = Pt(17); r3.font.color.rgb = col
         r4 = p2.add_run(); r4.text = mit; r4.font.name = FONT_NAME_HEAD; r4.font.bold = True; r4.font.size = Pt(17); r4.font.color.rgb = col
 
-    set_notes(s16, """[PRESENTER SCRIPT - SLIDE 16: CHALLENGES & MITIGATIONS]
+    set_notes(s17, """[PRESENTER SCRIPT - SLIDE 17: CHALLENGES & MITIGATIONS]
 "Sirs, we encountered and engineered solutions for three primary technical challenges:
 1. Environmental Clutter and Ambient Noise: Distortions from inanimate objects were mitigated by 52 active carrier masking and rolling median filtering.
 2. False Alarms on Boundary Exits: Doorway transitions caused single-frame flickering; mitigated by designing dual-threshold temporal hysteresis latching.
@@ -886,13 +915,18 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
 """)
 
     # =========================================================================
-    # SLIDE 17: FUTURE SCOPE — ROADMAP TO FINAL PRESENTATION
+    # SLIDE 18: FUTURE SCOPE — ROADMAP TO FINAL PRESENTATION
     # =========================================================================
-    s17 = prs.slides.add_slide(blank_layout)
-    add_red_header(s17, "FUTURE SCOPE & ROADMAP")
-    add_footer(s17)
+    s18 = prs.slides.add_slide(blank_layout)
+    add_red_header(s18, "FUTURE SCOPE & ROADMAP")
+    add_footer(s18)
 
-    add_card(s17, c1_left, CONTENT_TOP, col3_w, CONTENT_H, "COMPLETED (85%)", COLOR_ACCENT_GRN)
+    col3_w = Inches(3.577)
+    c1_left = M_LEFT
+    c2_left = M_LEFT + col3_w + Inches(0.40)
+    c3_left = c2_left + col3_w + Inches(0.40)
+
+    add_card(s18, c1_left, CONTENT_TOP, col3_w, CONTENT_H, "COMPLETED (85%)", COLOR_ACCENT_GRN)
     c_pts = [
         "✔ Dual ESP32 hardware testbed operational.",
         "✔ 921,600 baud serial pipeline locked.",
@@ -901,26 +935,26 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
         "✔ 3D Sensing Observatory HUD deployed.",
         "✔ Empirical dataset of 570+ sessions."
     ]
-    add_bullet_list(s17, c1_left, CONTENT_TOP + Inches(0.78), col3_w, CONTENT_H - Inches(0.85), c_pts, space_after=12)
+    add_bullet_list(s18, c1_left, CONTENT_TOP + Inches(0.78), col3_w, CONTENT_H - Inches(0.85), c_pts, space_after=12)
 
-    add_card(s17, c2_left, CONTENT_TOP, col3_w, CONTENT_H, "IN PROGRESS (10%)", COLOR_ACCENT_BLUE)
+    add_card(s18, c2_left, CONTENT_TOP, col3_w, CONTENT_H, "IN PROGRESS (10%)", COLOR_ACCENT_BLUE)
     w_pts = [
         "⏳ Recording physical unseen holdout dataset.",
         "⏳ Penetration trials through thick brick partitions.",
-        "⏳ Embedding recorded video trial demonstration into slides.",
+        "⏳ Real-time field video demonstration integration.",
         "⏳ Real-time latency benchmark stress tests."
     ]
-    add_bullet_list(s17, c2_left, CONTENT_TOP + Inches(0.78), col3_w, CONTENT_H - Inches(0.85), w_pts, space_after=16)
+    add_bullet_list(s18, c2_left, CONTENT_TOP + Inches(0.78), col3_w, CONTENT_H - Inches(0.85), w_pts, space_after=16)
 
-    add_card(s17, c3_left, CONTENT_TOP, col3_w, CONTENT_H, "TARGET FOR FINAL (5%)", COLOR_ACCENT_RED)
+    add_card(s18, c3_left, CONTENT_TOP, col3_w, CONTENT_H, "TARGET FOR FINAL (5%)", COLOR_ACCENT_RED)
     f_pts = [
         "★ Feasibility study of dual-link mesh triangulation (2 TX, 1 RX).",
         "★ Lightweight packaging for field tactical deployment on rugged edge nodes.",
         "★ Final technical project report and dissertation submission."
     ]
-    add_bullet_list(s17, c3_left, CONTENT_TOP + Inches(0.78), col3_w, CONTENT_H - Inches(0.85), f_pts, space_after=20)
+    add_bullet_list(s18, c3_left, CONTENT_TOP + Inches(0.78), col3_w, CONTENT_H - Inches(0.85), f_pts, space_after=20)
 
-    set_notes(s17, """[PRESENTER SCRIPT - SLIDE 17: FUTURE SCOPE & ROADMAP]
+    set_notes(s18, """[PRESENTER SCRIPT - SLIDE 18: FUTURE SCOPE & ROADMAP]
 "Sirs, summarizing our progress and trajectory towards final defence:
 - We have completed 85% of our milestones: the dual-node hardware is operational, serial streaming is locked, signal filters are calibrated, 25/25 automated tests pass, and the 3D Observatory is live.
 - Our current work in progress (10%) focuses on collecting unseen room holdout datasets, conducting thicker brick barrier penetration trials, and fine-tuning demo video integration.
@@ -928,13 +962,13 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
 """)
 
     # =========================================================================
-    # SLIDE 18: CONCLUSION
+    # SLIDE 19: CONCLUSION
     # =========================================================================
-    s18 = prs.slides.add_slide(blank_layout)
-    add_red_header(s18, "CONCLUSION")
-    add_footer(s18)
+    s19 = prs.slides.add_slide(blank_layout)
+    add_red_header(s19, "CONCLUSION")
+    add_footer(s19)
 
-    add_card(s18, M_LEFT, CONTENT_TOP, TOTAL_WIDTH, CONTENT_H, "KEY TAKEAWAYS & PROJECT STATUS", COLOR_ACCENT_RED)
+    add_card(s19, M_LEFT, CONTENT_TOP, TOTAL_WIDTH, CONTENT_H, "KEY TAKEAWAYS & PROJECT STATUS", COLOR_ACCENT_RED)
     concl_pts = [
         ("▪ Theory to Working Prototype:", COLOR_ACCENT_RED, "Successfully transitioned from broad theoretical literature review (LRP) to a working indigenous cyber-physical RF sensing prototype."),
         ("▪ Proven COTS Hardware Viability:", COLOR_ACCENT_RED, "Demonstrated that low-cost ESP32 microcontrollers can reliably extract Channel State Information and detect human presence in tactical environments."),
@@ -942,9 +976,9 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
         ("▪ Hardened Software Architecture:", COLOR_ACCENT_RED, "Delivered 921,600 baud serial pipeline, SVD coherence filtering, 25/25 automated unit tests, and interactive 3D tactical radar observatory."),
         ("▪ Fully on Track for Final Defence:", COLOR_ACCENT_RED, "Project is 85% complete and on schedule for final semester submission and field live demonstration.")
     ]
-    add_bullet_list(s18, M_LEFT, CONTENT_TOP + Inches(0.78), TOTAL_WIDTH, CONTENT_H - Inches(0.85), concl_pts, space_after=14)
+    add_bullet_list(s19, M_LEFT, CONTENT_TOP + Inches(0.78), TOTAL_WIDTH, CONTENT_H - Inches(0.85), concl_pts, space_after=14)
 
-    set_notes(s18, """[PRESENTER SCRIPT - SLIDE 18: CONCLUSION]
+    set_notes(s19, """[PRESENTER SCRIPT - SLIDE 19: CONCLUSION]
 "To conclude, sirs:
 - We have successfully transitioned from broad theoretical literature review to an indigenous, functioning cyber-physical prototype.
 - We demonstrated that low-cost COTS ESP32 microcontrollers can reliably extract Channel State Information and detect human presence through non-metallic CQB barriers.
@@ -954,13 +988,13 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
 """)
 
     # =========================================================================
-    # SLIDE 19: REFERENCES
+    # SLIDE 20: REFERENCES
     # =========================================================================
-    s19 = prs.slides.add_slide(blank_layout)
-    add_red_header(s19, "REFERENCES")
-    add_footer(s19)
+    s20 = prs.slides.add_slide(blank_layout)
+    add_red_header(s20, "REFERENCES")
+    add_footer(s20)
 
-    add_card(s19, M_LEFT, CONTENT_TOP, TOTAL_WIDTH, CONTENT_H, "KEY LITERATURE & TECHNICAL REFERENCES", COLOR_ACCENT_BLUE)
+    add_card(s20, M_LEFT, CONTENT_TOP, TOTAL_WIDTH, CONTENT_H, "KEY LITERATURE & TECHNICAL REFERENCES", COLOR_ACCENT_BLUE)
     refs = [
         "1. Chen, Z., Zhang, L., Jiang, C., Cao, Z., & Cui, W. (2018). WiFi sensing with channel state information: A survey. ACM Computing Surveys, 52(3), 1–36.",
         "2. Wang, X., Gao, L., Guo, S., & Bi, Y. (2015). DeepFi: Deep learning for indoor fingerprinting using channel state information. IEEE WCNC.",
@@ -969,25 +1003,25 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
         "5. Hernandez, S. M., & Bulut, E. (2020). WiFi Sensing with ESP32: A low-cost IoT platform for CSI data collection. IEEE Communications Magazine.",
         "6. Nirmal, I., Khamis, A., Hu, W., Hassan, M., & Zhu, X. (2021). Deep Learning for Radio-based Human Sensing. IEEE Communications Surveys & Tutorials."
     ]
-    add_bullet_list(s19, M_LEFT, CONTENT_TOP + Inches(0.78), TOTAL_WIDTH, CONTENT_H - Inches(0.85), refs, space_after=14)
+    add_bullet_list(s20, M_LEFT, CONTENT_TOP + Inches(0.78), TOTAL_WIDTH, CONTENT_H - Inches(0.85), refs, space_after=14)
 
-    set_notes(s19, """[PRESENTER SCRIPT - SLIDE 19: REFERENCES]
+    set_notes(s20, """[PRESENTER SCRIPT - SLIDE 20: REFERENCES]
 "Sirs, our research builds upon foundational academic and IEEE literature, including ACM survey papers on Wi-Fi CSI sensing by Chen et al., DeepFi indoor localization, through-wall RF pose estimation by Katabi's group at MIT, and low-cost ESP32 sensing platforms by Hernandez and Bulut."
 """)
 
     # =========================================================================
-    # SLIDE 20: JAI HIND (CLOSING SLIDE)
+    # SLIDE 21: JAI HIND (CLOSING SLIDE)
     # =========================================================================
-    s20 = prs.slides.add_slide(blank_layout)
-    add_red_header(s20, "JAI HIND", is_center=True)
+    s21 = prs.slides.add_slide(blank_layout)
+    add_red_header(s21, "JAI HIND", is_center=True)
 
-    c_card = s20.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.80), Inches(4.70), Inches(9.733), Inches(2.05))
+    c_card = s21.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.80), Inches(4.70), Inches(9.733), Inches(2.05))
     c_card.fill.solid()
     c_card.fill.fore_color.rgb = COLOR_CARD_BG
     c_card.line.color.rgb = COLOR_CARD_BORDER
     c_card.line.width = Pt(1.5)
 
-    tb_jh = s20.shapes.add_textbox(Inches(1.80), Inches(4.70), Inches(9.733), Inches(2.05))
+    tb_jh = s21.shapes.add_textbox(Inches(1.80), Inches(4.70), Inches(9.733), Inches(2.05))
     tf_jh = tb_jh.text_frame
     tf_jh.margin_top = Inches(0.24)
 
@@ -1017,7 +1051,7 @@ WiMotion resolves this by strictly enforcing pre-flight empty-room baseline veri
     p3.font.color.rgb = COLOR_DARK_TEXT
     p3.space_before = Pt(8)
 
-    set_notes(s20, """[PRESENTER SCRIPT - SLIDE 20: JAI HIND]
+    set_notes(s21, """[PRESENTER SCRIPT - SLIDE 21: JAI HIND]
 "This concludes our Intermediate Progress Presentation on Project WINS.
 We express our heartfelt gratitude to our guides, Lt Col Rajat Gaur and Maj Vaibhav Kukreti, and the esteemed evaluators.
 We now invite your valuable questions, feedback, and discussion.
