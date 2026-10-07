@@ -166,7 +166,7 @@ def main():
     print(f"  [7]  Node Mode (Role)    : {role_str:<16s} [OK]")
     print(f"  [8]  Effective CSI Rate  : {measured_fps:5.1f} packets/sec  [MEASURED]")
     if mean_dt > 0:
-        print(f"  [9]  Arrival Interval Δt : {mean_dt*1000.0:5.1f} ms (± {jitter_ms:.1f} ms jitter)")
+        print(f"  [9]  Arrival Interval dt : {mean_dt*1000.0:5.1f} ms (+/- {jitter_ms:.1f} ms jitter)")
     print(f"  [10] Nominal Target Rate : {NOMINAL_SAMPLING_RATE_HZ:5.1f} Hz          [CONFIGURED]")
     
     chan_str = ", ".join(channels) if channels else "6"
