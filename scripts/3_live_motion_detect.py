@@ -67,40 +67,56 @@ def main():
     port = args.port or select_port_interactive()
     ser = open_serial_with_reconnect(port, args.baud)
     engine = PresenceEngine(payload)
-    buffer = collections.deque(maxlen=200)
     valid = corrupt = 0
-    started = time.time(); last_eval = 0.0; last = engine.last; last_rssi = "N/A"
+    started = time.time()
+    last = engine.last
 
     print("=" * 92)
-    print(" WiMotion v2.0 — CONTACTLESS HUMAN PRESENCE OBSERVATORY (CLI)")
-    print(" Controlled sensing zone: ~1.5 m | 20 Hz uniform feature grid | Ctrl+C to stop")
+    print(" WiMotion v2.4 — CONTACTLESS HUMAN PRESENCE OBSERVATORY (CLI)")
+    print(" Signal Quality Gate Active (<4 Hz -> INFERENCE BLOCKED) | Ctrl+C to stop")
     print("=" * 92)
     try:
         while True:
             raw = ser.readline()
-            if not raw: continue
+            if not raw:
+                continue
             line = raw.decode("utf-8", errors="ignore").strip()
             meta, csi_raw = parse_csi_line(line)
             if meta is None:
-                if line.startswith("CSI_DATA"): corrupt += 1
+                if line.startswith("CSI_DATA"):
+                    corrupt += 1
                 continue
             amps = compute_subcarrier_amplitudes(csi_raw, num_subcarriers=NUM_SUBCARRIERS)
             if amps is None:
-                corrupt += 1; continue
-            now = time.time(); buffer.append((now, amps)); valid += 1
-            if meta.get("rssi") != "N/A": last_rssi = meta["rssi"]
-            if now - last_eval < PREDICTION_INTERVAL_SEC: continue
-            last_eval = now
-            tuples = [x for x in buffer if x[0] >= now - WINDOW_DURATION_SEC]
-            if len(tuples) < MIN_WINDOW_FRAMES: continue
-            ts = np.array([x[0] for x in tuples]); amps_arr = np.array([x[1] for x in tuples])
-            try: last = engine.predict(amps_arr, ts)
-            except Exception as e: print(f"\n[!] Prediction error: {e}"); continue
-            fps = valid / max(0.1, now-started)
-            status_str = last.get('status') or last.get('state', 'SENSING ZONE CLEAR')
-            print(f"\r[{status_str:20s}] Presence {last['presence_score']*100:5.1f}% | "
-                  f"Confidence {last['confidence']*100:5.1f}% | Coherence {last['coherence']:.3f} | "
-                  f"CSI {fps:5.1f} Hz | RSSI {last_rssi:>4s} dBm | Peak {last['peak_frequency_hz']:.2f} Hz", end="", flush=True)
+                corrupt += 1
+                continue
+            
+            now = time.time()
+            valid += 1
+            rssi_val = -60.0
+            if meta.get("rssi") not in (None, "N/A"):
+                try:
+                    rssi_val = float(meta["rssi"])
+                except ValueError:
+                    rssi_val = -60.0
+
+            res = engine.process_frame(amps, timestamp=now, rssi=rssi_val)
+            if res is None:
+                if valid < MIN_WINDOW_FRAMES:
+                    fps = valid / max(0.1, now - started)
+                    print(f"\r[BUFFER WARMUP      ] Ingesting CSI packets ({valid}/{MIN_WINDOW_FRAMES}) | Rate: {fps:4.1f} pkt/s...", end="", flush=True)
+                continue
+
+            last = res
+            status_str = last.get("status") or last.get("state", "SENSING ZONE CLEAR")
+            if last.get("signal_quality") == "UNSTABLE":
+                rate_hz = last.get("csi_rate_hz", 0.0)
+                print(f"\r[SIGNAL UNSTABLE    ] CSI Rate: {rate_hz:4.1f} Hz (<4 Hz) | INFERENCE BLOCKED | RSSI: {last.get('rssi_dbm', -60.0):.0f} dBm", end="", flush=True)
+            else:
+                pos_str = last.get("spatial_position", "CENTER")
+                print(f"\r[{status_str:20s}] Presence {last['presence_score']*100:5.1f}% | "
+                      f"Conf {last['confidence']*100:5.1f}% | Coherence {last['coherence']:.3f} | "
+                      f"CSI {last['csi_rate_hz']:4.1f} Hz | RSSI {last['rssi_dbm']:4.0f} dBm | Zone: {pos_str}", end="", flush=True)
     except KeyboardInterrupt:
         print("\n\n[+] Presence detection stopped.")
     finally:

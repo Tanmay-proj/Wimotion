@@ -80,6 +80,7 @@ def main():
     total_lines = 0
     valid_packets = 0
     corrupt_packets = 0
+    packet_timestamps = []
     rssi_list = []
     channels = set()
     roles = set()
@@ -102,7 +103,9 @@ def main():
             if meta is not None:
                 amps = compute_subcarrier_amplitudes(csi_raw, num_subcarriers=NUM_SUBCARRIERS)
                 if amps is not None and len(amps) == NUM_SUBCARRIERS:
+                    now_pkt = time.time()
                     valid_packets += 1
+                    packet_timestamps.append(now_pkt)
                     if meta.get("rssi") != "N/A":
                         try:
                             rssi_list.append(int(meta["rssi"]))
@@ -130,7 +133,18 @@ def main():
         ser.close()
 
     elapsed = time.time() - start_t
-    measured_fps = valid_packets / max(0.1, elapsed)
+    import numpy as np
+    if len(packet_timestamps) > 1:
+        dts = np.diff(packet_timestamps)
+        mean_dt = float(np.mean(dts))
+        std_dt = float(np.std(dts))
+        measured_fps = 1.0 / mean_dt if mean_dt > 0 else 0.0
+        jitter_ms = std_dt * 1000.0
+    else:
+        mean_dt = 0.0
+        std_dt = 0.0
+        measured_fps = valid_packets / max(0.1, elapsed)
+        jitter_ms = 0.0
 
     print("\n\n" + "=" * 70)
     print("                 WIMOTION HARDWARE CHECK REPORT")
@@ -150,28 +164,43 @@ def main():
     
     role_str = ", ".join(roles) if roles else "AP"
     print(f"  [7]  Node Mode (Role)    : {role_str:<16s} [OK]")
-    print(f"  [8]  Measured CSI Rate   : {measured_fps:5.1f} packets/sec  [MEASURED]")
-    print(f"  [9]  Nominal Target Rate : {NOMINAL_SAMPLING_RATE_HZ:5.1f} Hz          [CONFIGURED]")
+    print(f"  [8]  Effective CSI Rate  : {measured_fps:5.1f} packets/sec  [MEASURED]")
+    if mean_dt > 0:
+        print(f"  [9]  Arrival Interval Δt : {mean_dt*1000.0:5.1f} ms (± {jitter_ms:.1f} ms jitter)")
+    print(f"  [10] Nominal Target Rate : {NOMINAL_SAMPLING_RATE_HZ:5.1f} Hz          [CONFIGURED]")
     
     chan_str = ", ".join(channels) if channels else "6"
-    print(f"  [10] WiFi Channel        : {chan_str:<16s} [OK]")
+    print(f"  [11] WiFi Channel        : {chan_str:<16s} [OK]")
     
     avg_rssi_str = f"{sum(rssi_list)/len(rssi_list):.1f} dBm" if rssi_list else "N/A"
-    print(f"  [11] Average RSSI        : {avg_rssi_str:<16s} [OK]")
+    print(f"  [12] Average RSSI        : {avg_rssi_str:<16s} [OK]")
     print("=" * 70)
 
-    MIN_REQUIRED_RATE_HZ = 8.0  # Minimum acceptable rate (80% of nominal 10 Hz)
-
-    if measured_fps >= MIN_REQUIRED_RATE_HZ and corrupt_packets == 0:
-        print(f"\nHardware status: READY (Optimal {measured_fps:.1f} pkt/s RF stream, 0 packet corruption)")
-        print(f"                 Next Step: Run '1_field_calibrate.py --port {port_name}' to record motion data!")
-    elif measured_fps >= MIN_REQUIRED_RATE_HZ:
-        print(f"\nHardware status: READY ({measured_fps:.1f} pkt/s stream verified; note {corrupt_packets} dropped frames)")
-        print(f"                 Next Step: Run '1_field_calibrate.py --port {port_name}'")
+    # 3-Tier Hardware Readiness Assessment:
+    # >= 8.0 Hz: READY (Optimal stream for live demo)
+    # 4.0 - 8.0 Hz: WARNING (Sub-optimal, may experience lag or jitter)
+    # < 4.0 Hz: CRITICAL / NOT READY (Signal Quality Gate will BLOCK inference!)
+    if measured_fps >= 8.0 and corrupt_packets == 0:
+        print(f"\nHardware Status: READY [OPTIMAL]")
+        print(f"  Verified {measured_fps:.1f} pkt/s RF stream with 0 corruption.")
+        print(f"  Arrival interval: {mean_dt*1000.0:.1f} ms. System is ready for live demonstration!")
+    elif measured_fps >= 8.0:
+        print(f"\nHardware Status: READY [WARNING: {corrupt_packets} corrupted frames]")
+        print(f"  CSI rate ({measured_fps:.1f} pkt/s) meets demo criteria, but check USB cable/baud to reduce dropped frames.")
+    elif measured_fps >= 4.0:
+        print(f"\nHardware Status: WARNING [SUB-OPTIMAL STREAM: {measured_fps:.1f} pkt/s]")
+        print(f"  Stream rate is between 4.0 Hz and 8.0 Hz.")
+        print(f"  Signal Quality Gate will allow inference, but temporal response may lag or jitter.")
+        print(f"  Recommended: Check antenna line of sight and re-verify transmitter pacing.")
     else:
-        print("\nHardware status: NOT READY")
-        print(f"Reason: Measured CSI rate ({measured_fps:.1f} pkt/s) is below required threshold ({MIN_REQUIRED_RATE_HZ:.1f} Hz).")
-        print("        Check antenna orientation, ensure Tx/Rx line of sight, and verify power stability.")
+        print(f"\nHardware Status: CRITICAL / NOT READY [STREAM TOO LOW: {measured_fps:.1f} pkt/s < 4.0 Hz]")
+        print(f"  WARNING: WiMotion Signal Quality Gate will actively BLOCK inference during live demo!")
+        print(f"  Troubleshooting steps:")
+        print(f"    1. Confirm baud rate is 921600 (not 115200) to prevent UART buffer overflow.")
+        print(f"    2. Ensure both Node 1 (STA) and Node 2 (AP) are powered and within 1-2 meters.")
+        print(f"    3. Use direct motherboard USB ports; avoid unpowered USB splitters/hubs.")
+        print(f"    4. Check if firmware vTaskDelay in active_sta is pacing at ~25-100ms.")
+        print(f"    5. If hardware remains unstable, use Demo Backup Option 2 (Replay Golden Session).")
     print("=" * 70)
 
 if __name__ == "__main__":

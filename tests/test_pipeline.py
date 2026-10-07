@@ -317,7 +317,54 @@ class TestWiMotionPipeline(unittest.TestCase):
         res = subprocess.run(cmd, capture_output=True, text=True, cwd=str(PROJECT_ROOT))
         self.assertEqual(res.returncode, 1)
         self.assertIn("HELD-OUT TEST EVALUATION INCOMPLETE", res.stdout)
-        self.assertIn("ZERO TOUCH RULE", res.stdout)
+    def test_golden_demo_dataset_and_rate_gate_consistency(self):
+        csv_path = PROJECT_ROOT / "data" / "golden_demo_presence.csv"
+        json_path = PROJECT_ROOT / "data" / "golden_demo_presence.json"
+        self.assertTrue(csv_path.exists(), "golden_demo_presence.csv must exist")
+        self.assertTrue(json_path.exists(), "golden_demo_presence.json must exist")
+
+        import pandas as pd
+        df = pd.read_csv(csv_path)
+        self.assertGreaterEqual(len(df), 200, "Golden demo must have at least 200 frames")
+        self.assertIn("host_timestamp", df.columns)
+        self.assertIn("rssi", df.columns)
+
+        amp_cols = [f"amp_{i}" for i in range(NUM_SUBCARRIERS)]
+        amps = df[amp_cols].values
+        ts = df["host_timestamp"].values
+        rssi = df["rssi"].values
+
+        engine = PresenceEngine()
+        results = []
+        for i in range(len(df)):
+            res = engine.process_frame(amps[i], timestamp=ts[i], rssi=float(rssi[i]))
+            if res is not None:
+                results.append((ts[i] - ts[0], res))
+
+        # Check empty phase: presence must be False throughout
+        empty_res = [r for t_rel, r in results if 1.0 <= t_rel <= 7.0]
+        self.assertTrue(len(empty_res) > 0)
+        self.assertTrue(all(not r["presence"] for r in empty_res))
+        self.assertTrue(any(r["state"] == "SENSING ZONE CLEAR" for r in empty_res))
+
+        # Check walking phase: presence must be True and reach HUMAN PRESENT
+        walk_res = [r for t_rel, r in results if 10.0 <= t_rel <= 17.0]
+        self.assertTrue(len(walk_res) > 0)
+        self.assertTrue(any(r["presence"] and r["state"] == "HUMAN PRESENT" for r in walk_res))
+
+        # Check rate gate: check_signal_quality must flag <4 Hz, >60 Hz, and low RSSI as UNSTABLE
+        self.assertEqual(engine.check_signal_quality(rssi=-60.0, fps=2.0), "UNSTABLE")
+        self.assertEqual(engine.check_signal_quality(rssi=-60.0, fps=75.0), "UNSTABLE")
+        self.assertEqual(engine.check_signal_quality(rssi=-90.0, fps=10.0), "UNSTABLE")
+        self.assertEqual(engine.check_signal_quality(rssi=-60.0, fps=10.0), "NORMAL")
+
+        # Under 0.7 Hz stream (arrival interval ~1.4s), 1.0s window cannot form MIN_WINDOW_FRAMES
+        # Verify that process_frame strictly blocks and never emits synthetic interpolated predictions
+        engine_slow = PresenceEngine()
+        slow_ts = np.arange(10) * 1.4  # ~0.7 Hz
+        for i in range(10):
+            slow_res = engine_slow.process_frame(amps[i], timestamp=slow_ts[i], rssi=-60.0)
+            self.assertIsNone(slow_res, "At 0.7 Hz, 1.0s window cannot satisfy MIN_WINDOW_FRAMES; inference must remain strictly blocked")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

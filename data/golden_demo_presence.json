@@ -1,0 +1,28 @@
+{
+  "session_id": "golden_demo_presence",
+  "description": "Gold standard demo backup session for live demonstration and regression verification",
+  "total_frames": 260,
+  "duration_sec": 26.0,
+  "nominal_sampling_rate_hz": 10.0,
+  "source": "Physical empirical CSI from ESP32 testbed (genuine empty_room + walking)",
+  "phases": [
+    {
+      "start_sec": 0.0,
+      "end_sec": 8.0,
+      "ground_truth": "empty_room",
+      "expected_state": "SENSING ZONE CLEAR"
+    },
+    {
+      "start_sec": 8.0,
+      "end_sec": 18.0,
+      "ground_truth": "human_present",
+      "expected_state": "HUMAN PRESENT"
+    },
+    {
+      "start_sec": 18.0,
+      "end_sec": 26.0,
+      "ground_truth": "empty_room",
+      "expected_state": "SENSING ZONE CLEAR"
+    }
+  ]
+}

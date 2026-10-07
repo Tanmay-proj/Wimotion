@@ -58,7 +58,7 @@ def main():
         print("  [1] Rigorous 100-Session Hardware Data Recorder (v3.0 - Scientific Protocol)")
         print("  [2] Train Master Human Presence Model (LOSO CV & Augmentation)")
         print("  [3] Launch Real-Time Live Human Presence CLI")
-        print("  [4] Run Automated Unit Tests (25 Verification Tests)")
+        print("  [4] Run Automated Unit Tests (26 Verification Tests)")
         print("  [5] Launch WiMotion 3D Observatory Dashboard (Live & Replay)")
         print("  [6] Run Complete 1-Click Pipeline (Train -> Latency -> Scorecard)")
         print("  [7] Run Zero-Leakage Session-Wise Evaluation (0% Window Leakage Scorecard)")

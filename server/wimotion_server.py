@@ -93,7 +93,7 @@ class SharedState:
     def __init__(self):
         self.lock = threading.Lock()
         self.mode = "REPLAY"
-        self.session = "walking.csv"
+        self.session = "golden_demo_presence.csv"
         self.port = "COM8"
         self.baudrate = DEFAULT_BAUDRATE
         self.speed = 1.0
@@ -117,7 +117,7 @@ class SharedState:
             "raw_presence_probability": 0.0,
             "amplitudes": [10.0] * NUM_SUBCARRIERS,
             "mode": "REPLAY",
-            "session": "walking.csv",
+            "session": "golden_demo_presence.csv",
             "spatial_position": "CENTER",
             "spatial_position_type": "COARSE_HEURISTIC_ZONE",
             "signal_quality": "NORMAL",
@@ -365,7 +365,7 @@ def replay_worker():
             continue
 
         with state.lock:
-            current_session = state.session if state.session else "walking.csv"
+            current_session = state.session if state.session else "golden_demo_presence.csv"
             state.session_changed = False
 
         engine.reset()
