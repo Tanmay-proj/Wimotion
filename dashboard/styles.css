@@ -63,10 +63,21 @@ body {
   background: var(--accent-cyan); color: #000; box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
 }
 
-.spatial-status, .signal-status, .tare-status, .live-chip {
+.spatial-status, .occupancy-status, .signal-status, .tare-status, .live-chip {
   font-size: 11px; font-family: var(--font-mono); display: flex; align-items: center; gap: 6px;
   padding: 4px 10px; border-radius: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
   white-space: nowrap; flex-shrink: 0;
+}
+.occupancy-status {
+  background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.25); color: var(--accent-cyan);
+}
+.occupancy-status.multi {
+  background: rgba(255, 51, 102, 0.15); border-color: rgba(255, 51, 102, 0.5);
+  color: #ff5e7e; box-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+}
+.occupancy-badge-panel.multi {
+  background: rgba(255, 51, 102, 0.18) !important; border-color: rgba(255, 51, 102, 0.5) !important;
+  color: #ff5e7e !important; box-shadow: 0 0 12px rgba(255, 51, 102, 0.3) !important;
 }
 .dot-sm { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); flex-shrink: 0; }
 .signal-status.normal .dot-sm { background: var(--accent-green); }

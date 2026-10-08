@@ -31,6 +31,7 @@
     </div>
 
     <div id="spatial-badge" class="spatial-status"><span class="dot-sm"></span>ZONE: <b id="spatial-text">CENTER</b> <small style="opacity:0.6;font-size:9px;">(COARSE RF)</small></div>
+    <div id="occupancy-badge" class="occupancy-status"><span class="dot-sm" style="background:#00f2fe;"></span>OCCUPANCY: <b id="occupancy-count-text">0 (CLEAR)</b></div>
     <div id="signal-badge" class="signal-status normal"><span class="dot-sm"></span><span id="signal-text">SIGNAL: NORMAL</span></div>
     <div id="tare-badge" class="tare-status"><span class="dot-sm"></span><span id="tare-text">BASELINE: ADAPTIVE</span></div>
     <div class="live-chip"><i id="conn-dot"></i><span id="conn-text">CONNECTING</span></div>
@@ -116,6 +117,9 @@
     </div>
 
     <div id="status-badge" class="status clear">SENSING ZONE CLEAR</div>
+    <div id="occupancy-panel-badge" class="status occupancy-badge-panel" style="margin-top:6px;font-size:12px;padding:8px;background:rgba(0,242,254,0.08);border:1px solid rgba(0,242,254,0.25);color:#00f2fe;display:flex;align-items:center;justify-content:center;gap:6px;">
+      <span class="dot-sm" style="background:#00f2fe;"></span><span id="occupancy-panel-text">OCCUPANCY: 0 (CLEAR)</span>
+    </div>
     <div id="activity-badge" class="status activity-badge disabled" style="opacity:0.5;">STAGE 2 ACTIVITY: DISABLED</div>
     <div id="activity-disclaimer" class="research-only" style="font-size:9px;color:#8b949e;text-align:center;margin-top:2px;padding:0 6px;line-height:1.3;">
       Activity head disabled (14.49% cross-room accuracy). Pass --enable-activity-experimental to activate.

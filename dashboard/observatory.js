@@ -576,12 +576,29 @@ function createHumanRadiationAvatar() {
   };
 }
 
-const avatar = createHumanRadiationAvatar();
-scene.add(avatar.group);
+// ------------------------------------------------------------------------------
+// Multi-Zone Tactical Avatars (Wi-CaL Multi-Occupancy System)
+// ------------------------------------------------------------------------------
+const ZONE_DEFINITIONS = {
+  'CROSS_LOS': { pos: new THREE.Vector3(0.0, -0.49, 0.85),  name: 'DOORWAY / ENTRY' },
+  'CENTER':    { pos: new THREE.Vector3(0.0, -0.49, 0.0),   name: 'ROOM CORE' },
+  'NEAR_RX':   { pos: new THREE.Vector3(0.95, -0.49, 0.35), name: 'FAR SECTOR (RX)' },
+  'NEAR_TX':   { pos: new THREE.Vector3(-0.95, -0.49, -0.45), name: 'LEFT FLANK (TX)' }
+};
 
-let currentAvatarOpacity = 0.0;
-let targetAvatarOpacity = 0.0;
-const targetAvatarPos = new THREE.Vector3(0.0, -0.49, 0.0);
+const zoneAvatars = {};
+for (const [zoneKey, zoneData] of Object.entries(ZONE_DEFINITIONS)) {
+  const av = createHumanRadiationAvatar();
+  av.group.position.copy(zoneData.pos);
+  scene.add(av.group);
+  zoneAvatars[zoneKey] = {
+    ...av,
+    basePos: zoneData.pos.clone(),
+    currentOpacity: 0.0,
+    targetOpacity: 0.0,
+    name: zoneData.name
+  };
+}
 
 // ------------------------------------------------------------------------------
 // Subcarrier 64 Spectrum Canvas
@@ -826,12 +843,57 @@ function updateTelemetry(data) {
     }
   }
 
-  // Coarse Zone Indicator (Dynamic Position Tracking)
-  document.getElementById('spatial-text').innerText = pos;
-  if (pos === 'NEAR_TX') targetAvatarPos.set(-0.95, -0.49, -0.6);
-  else if (pos === 'NEAR_RX') targetAvatarPos.set(0.95, -0.49, 0.4);
-  else if (pos === 'CROSS_LOS') targetAvatarPos.set(0.0, -0.49, 0.85);
-  else targetAvatarPos.set(0.0, -0.49, 0.0);
+  // Multi-Occupancy and Tactical Spatial Zones (Wi-CaL Multi-Target System)
+  const occCount = data.occupancy_count !== undefined ? data.occupancy_count : (status === 'HUMAN PRESENT' ? 1 : 0);
+  const activeZones = (Array.isArray(data.active_zones) && data.active_zones.length > 0 && data.active_zones[0] !== 'NONE')
+    ? data.active_zones
+    : (pos && pos !== 'NONE' ? [pos] : ['CENTER']);
+
+  document.getElementById('spatial-text').innerText = activeZones.join(' + ');
+
+  // Update Topbar and Panel Occupancy Badges
+  const occCountEl = document.getElementById('occupancy-count-text');
+  const occBadgeEl = document.getElementById('occupancy-badge');
+  const occPanelText = document.getElementById('occupancy-panel-text');
+  const occPanelBadge = document.getElementById('occupancy-panel-badge');
+
+  if (occCount === 0 || status === 'SENSING ZONE CLEAR') {
+    if (occCountEl) occCountEl.innerText = '0 (CLEAR)';
+    if (occBadgeEl) occBadgeEl.className = 'occupancy-status';
+    if (occPanelText) occPanelText.innerText = 'OCCUPANCY: 0 (CLEAR)';
+    if (occPanelBadge) occPanelBadge.className = 'status occupancy-badge-panel';
+  } else if (occCount === 1) {
+    const zName = ZONE_DEFINITIONS[activeZones[0]] ? ZONE_DEFINITIONS[activeZones[0]].name : activeZones[0];
+    if (occCountEl) occCountEl.innerText = `1 PERSON [${activeZones[0]}]`;
+    if (occBadgeEl) occBadgeEl.className = 'occupancy-status';
+    if (occPanelText) occPanelText.innerText = `OCCUPANCY: 1 PERSON [${zName}]`;
+    if (occPanelBadge) occPanelBadge.className = 'status occupancy-badge-panel';
+  } else {
+    const zList = activeZones.map(z => ZONE_DEFINITIONS[z] ? ZONE_DEFINITIONS[z].name : z).join(' + ');
+    if (occCountEl) occCountEl.innerText = `${occCount} PERSONS (MULTI-TARGET)`;
+    if (occBadgeEl) occBadgeEl.className = 'occupancy-status multi';
+    if (occPanelText) occPanelText.innerText = `OCCUPANCY: ${occCount} PERSONS [${zList}]`;
+    if (occPanelBadge) occPanelBadge.className = 'status occupancy-badge-panel multi';
+  }
+
+  // Update Target Opacities for Anchored Zone Avatars (No more awkward skating!)
+  for (const [zoneKey, av] of Object.entries(zoneAvatars)) {
+    if (status === 'HUMAN PRESENT') {
+      if (activeZones.includes(zoneKey)) {
+        av.targetOpacity = 1.0;
+      } else {
+        av.targetOpacity = 0.0;
+      }
+    } else if (status === 'ANALYZING...') {
+      if (zoneKey === 'CENTER' || activeZones.includes(zoneKey)) {
+        av.targetOpacity = 0.35;
+      } else {
+        av.targetOpacity = 0.0;
+      }
+    } else {
+      av.targetOpacity = 0.0;
+    }
+  }
 
   // Signal Quality badge update
   const signalBadge = document.getElementById('signal-badge');
@@ -887,41 +949,48 @@ function animate() {
   // Orbit controls damping
   if (controls) controls.update();
 
-  // Smooth Avatar Opacity Fade Transition (Empty Room vs Human Present)
-  currentAvatarOpacity += (targetAvatarOpacity - currentAvatarOpacity) * 0.08;
-  if (currentAvatarOpacity < 0.005) {
-    avatar.group.visible = false;
-  } else {
-    avatar.group.visible = true;
-    avatar.materials.forEach(m => {
-      if (m.userData.baseOpacity === undefined) {
-        m.userData.baseOpacity = m.opacity;
+  // Smooth Avatar Opacities & Breathing for All Zone Avatars
+  let highestOpacity = 0.0;
+  let dominantPos = new THREE.Vector3(0, -0.49, 0);
+
+  for (const av of Object.values(zoneAvatars)) {
+    av.currentOpacity += (av.targetOpacity - av.currentOpacity) * 0.08;
+    if (av.currentOpacity < 0.005) {
+      av.group.visible = false;
+    } else {
+      av.group.visible = true;
+      av.materials.forEach(m => {
+        if (m.userData.baseOpacity === undefined) {
+          m.userData.baseOpacity = m.opacity;
+        }
+        m.opacity = m.userData.baseOpacity * av.currentOpacity;
+      });
+
+      if (av.currentOpacity > highestOpacity) {
+        highestOpacity = av.currentOpacity;
+        dominantPos.copy(av.group.position);
       }
-      m.opacity = m.userData.baseOpacity * currentAvatarOpacity;
-    });
-  }
-
-  // Smooth Position Lerp towards target spatial zone
-  avatar.group.position.lerp(targetAvatarPos, 0.06);
-
-  // Subtle Natural Respiration Breathing Pulse (0.25 Hz)
-  const breath = 1.0 + 0.025 * Math.sin(t * 1.8);
-  avatar.group.scale.set(breath, breath, breath);
-
-  // Radiation Particles Ascending and Orbiting around Human Body
-  const pPositions = avatar.particleSystem.geometry.attributes.position.array;
-  for (let i = 0; i < avatar.particleCount; i++) {
-    const vel = avatar.particleVels[i];
-    vel.angle += vel.rotSpeed;
-    pPositions[i * 3] = Math.cos(vel.angle) * vel.radius;
-    pPositions[i * 3 + 1] += vel.speedY;
-    pPositions[i * 3 + 2] = Math.sin(vel.angle) * vel.radius;
-
-    if (pPositions[i * 3 + 1] > 1.85) {
-      pPositions[i * 3 + 1] = 0.05;
     }
+
+    // Subtle Natural Respiration Breathing Pulse (0.25 Hz)
+    const breath = 1.0 + 0.025 * Math.sin(t * 1.8);
+    av.group.scale.set(breath, breath, breath);
+
+    // Radiation Particles Ascending and Orbiting around Human Body
+    const pPositions = av.particleSystem.geometry.attributes.position.array;
+    for (let i = 0; i < av.particleCount; i++) {
+      const vel = av.particleVels[i];
+      vel.angle += vel.rotSpeed;
+      pPositions[i * 3] = Math.cos(vel.angle) * vel.radius;
+      pPositions[i * 3 + 1] += vel.speedY;
+      pPositions[i * 3 + 2] = Math.sin(vel.angle) * vel.radius;
+
+      if (pPositions[i * 3 + 1] > 1.85) {
+        pPositions[i * 3 + 1] = 0.05;
+      }
+    }
+    av.particleSystem.geometry.attributes.position.needsUpdate = true;
   }
-  avatar.particleSystem.geometry.attributes.position.needsUpdate = true;
 
   // Concentric Blue Wireframe Spheres Wave Pulse (Radio Frequency Waves)
   blueShells.forEach(s => {
@@ -930,9 +999,9 @@ function animate() {
   });
 
   // Dynamic Floor Matrix Tile Illumination + Point Light
-  tileMat.emissiveIntensity = 0.12 + currentAvatarOpacity * 0.40;
-  greenPointLight.position.copy(avatar.group.position).add(new THREE.Vector3(0, 1.1, 0));
-  greenPointLight.intensity = currentAvatarOpacity * 2.8;
+  tileMat.emissiveIntensity = 0.12 + highestOpacity * 0.40;
+  greenPointLight.position.copy(dominantPos).add(new THREE.Vector3(0, 1.1, 0));
+  greenPointLight.intensity = highestOpacity * 2.8;
 
   renderer.render(scene, camera);
 }

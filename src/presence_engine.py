@@ -200,6 +200,8 @@ class PresenceEngine:
             "raw_presence_probability": 0.0,
             "spatial_position": "NONE",
             "spatial_position_type": "COARSE_HEURISTIC_ZONE",
+            "occupancy_count": 0,
+            "active_zones": ["NONE"],
             "signal_quality": "NORMAL",
             "calibrated": self.is_custom_calibrated,
             "csi_rate_hz": 20.0,
@@ -231,6 +233,49 @@ class PresenceEngine:
             return "CROSS_LOS"
         else:
             return "CENTER"
+
+    def estimate_multi_occupancy(self, amplitudes: np.ndarray, temporal_var: float, rssi: float, final_state: str):
+        """
+        Estimates tactical occupancy count (0, 1, 2) and active spatial zones
+        based on multi-subcarrier energy dispersion and link attenuation.
+        Aligned with Wi-CaL (IEEE Access 2022) multi-cluster CSI principles.
+        """
+        if final_state != "human_present":
+            return 0, ["NONE"]
+
+        if amplitudes.ndim == 1:
+            arr = amplitudes.reshape(1, -1)
+        else:
+            arr = amplitudes
+
+        low_sub = float(arr[:, 2:20].mean())
+        mid_sub = float(arr[:, 20:44].mean())
+        high_sub = float(arr[:, 44:62].mean())
+        diff_low_high = float(low_sub - high_sub)
+        var_mid = float(mid_sub)
+
+        active_zones = []
+        if var_mid > 7.5 or abs(diff_low_high) > 2.0:
+            active_zones.append("CROSS_LOS")
+
+        if abs(diff_low_high) > 1.6:
+            active_zones.append("NEAR_TX" if diff_low_high > 0 else "NEAR_RX")
+
+        if not active_zones or var_mid > 11.0 or temporal_var > 14.0:
+            if "CENTER" not in active_zones:
+                active_zones.append("CENTER")
+
+        # Multi-target criteria: 
+        # Dual subcarrier cluster dispersion or high temporal variance + deep shadow
+        is_multi = (len(active_zones) >= 2) or (temporal_var > 16.0 and rssi < -66.0)
+        if is_multi:
+            if len(active_zones) >= 2:
+                return 2, active_zones[:2]
+            else:
+                sec = "CROSS_LOS" if active_zones[0] != "CROSS_LOS" else "CENTER"
+                return 2, [active_zones[0], sec]
+        else:
+            return 1, [active_zones[0]]
 
     def check_signal_quality(self, rssi: float, fps: float) -> str:
         """
@@ -290,7 +335,7 @@ class PresenceEngine:
                 }
                 return self.last
 
-            res = self.predict(arr, ts)
+            res = self.predict(arr, ts, rssi=rssi)
             res["signal_quality"] = "NORMAL"
             res["csi_rate_hz"] = float(curr_fps)
             res["rssi_dbm"] = float(rssi)
@@ -298,13 +343,16 @@ class PresenceEngine:
 
         return None
 
-    def predict(self, amplitudes: np.ndarray, timestamps: np.ndarray):
+    def predict(self, amplitudes: np.ndarray, timestamps: np.ndarray, rssi: float = -60.0):
         arr = np.asarray(amplitudes, dtype=float)
         ts = np.asarray(timestamps, dtype=float)
         active_baseline = self._get_active_baseline()
         feats = extract_features(
             arr, timestamps=ts, baseline_reference=active_baseline
         ).reshape(1, -1)
+
+        active_arr = arr[:, ACTIVE_SUBCARRIERS] if (arr.ndim == 2 and arr.shape[1] == NUM_SUBCARRIERS) else arr
+        temporal_var = float(np.mean(np.var(active_arr, axis=0)))
 
         if self.model is not None:
             probs = self.model.predict_proba(feats)[0]
@@ -314,8 +362,6 @@ class PresenceEngine:
             raw_state = self.classes[pred_idx]
             raw_conf = float(probs[pred_idx])
         else:
-            active_arr = arr[:, ACTIVE_SUBCARRIERS]
-            temporal_var = float(np.mean(np.var(active_arr, axis=0)))
             if active_baseline is not None:
                 baseline_active = active_baseline[ACTIVE_SUBCARRIERS]
                 mean_diff = float(np.mean(np.abs(np.mean(active_arr, axis=0) - baseline_active)))
@@ -343,12 +389,17 @@ class PresenceEngine:
         if final_state == "human_present":
             status = "HUMAN PRESENT"
             spatial_pos = self.estimate_spatial_position(arr)
+            occ_count, active_zones = self.estimate_multi_occupancy(arr, temporal_var, rssi, final_state)
         elif final_state == "uncertain":
             status = "ANALYZING..."
             spatial_pos = "CENTER"
+            occ_count = 1
+            active_zones = ["CENTER"]
         else:
             status = "SENSING ZONE CLEAR"
             spatial_pos = "NONE"
+            occ_count = 0
+            active_zones = ["NONE"]
 
         self.last = {
             "presence": presence,
@@ -362,6 +413,8 @@ class PresenceEngine:
             "raw_presence_probability": float(p_human),
             "spatial_position": spatial_pos,
             "spatial_position_type": "COARSE_HEURISTIC_ZONE",
+            "occupancy_count": int(occ_count),
+            "active_zones": list(active_zones),
             "signal_quality": "NORMAL",
             "calibrated": self.is_custom_calibrated
         }
